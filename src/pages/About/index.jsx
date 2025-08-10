@@ -1,4 +1,13 @@
+import Katalog from "../Katalog";
+
 const About = () => {
-return <h2>About</h2>
-}
+
+
+
+return( <div>
+    <Katalog />
+    <h1>About</h1>
+</div>
+);
+};
 export default About;

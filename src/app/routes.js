@@ -5,7 +5,7 @@ import Dashboard from "../pages/Dashboard";
 import Settings from "../pages/Dashboard/Settings";
 import Analytics from "../pages/Dashboard/Analytics";
 import UsersDetails from "../pages/Users/UsersDetails";
-import RootLayout from "../components/RootLayout";
+import RootLayout from "../components/Main";
 import Katalog from "../pages/Katalog";
 import Login from "../pages/Login";
 import Home from "../pages/Home";
@@ -19,6 +19,11 @@ import Telefonlar from "../pages/Katalog/Telefonlar";
 import Daşınmaz_əmlak from "../pages/Katalog/Daşınmaz_əmlak";
 import Məişət_Texnikası from "../pages/Katalog/Məişət_Texnikası";
 import Ehtiyyat_hissələri_ve_aksesuarlar from "../pages/Katalog/Ehtiyyat_hissələri_ve_aksesuarlar";
+import PostDetail from "../pages/PostDetail";
+import PostDetalCar from "../pages/PostDetalCar";
+import CreateCatalogPost from "../pages/CreateCatalogPost";
+
+
 
 
 const router = createBrowserRouter([
@@ -31,6 +36,16 @@ const router = createBrowserRouter([
         index: true,
         Component: Home,
       },
+    
+      {
+        path: "users",
+        Component: Users,
+      },
+      {
+        path: "users/:id",
+        Component: UsersDetails,
+      },
+    
       {
         path: "/",
         Component: Home,
@@ -45,9 +60,21 @@ const router = createBrowserRouter([
         Component: Nəqliyyat,
       },
       {
+        path: "/cars/:id",
+        Component: PostDetalCar,
+
+      },
+      {
         path: "/Katalog/Ev_veBag",
         Component: EvVəBag,
       },
+      
+      {
+        path: "/elan/:id",
+        Component: PostDetail,
+      },
+      
+       
 
       {
         path: "/Katalog/Elektronika",
@@ -112,6 +139,10 @@ const router = createBrowserRouter([
         path: "/login",
         Component: Login,
       },
+     {
+      path: "/CreateCatalogPost",
+      Component: CreateCatalogPost,
+     }
     ],
   },
 ]);

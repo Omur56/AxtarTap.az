@@ -1,4 +1,11 @@
+import Katalog from "../Katalog";
+
 const Users  = () => {
-    return <h2>Users</h2>
+    return (
+        <div>
+            <Katalog/>
+            <h1>Users</h1>
+        </div>
+    )
 };
 export default Users;

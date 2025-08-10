@@ -1,0 +1,24 @@
+const mongoose = require("mongoose");
+
+const RealEstateSchema = new mongoose.Schema({
+  title_type: String,
+  type_building: String,
+  field: String,
+  number_of_rooms: String,
+  location: String,
+  city: String,
+  price: String,
+  data: Date,
+  description: String,
+  contact: {
+    name: String,
+    email: String,
+    phone: String,
+    liked: Boolean,
+    favorite: Boolean,
+    data: Date,
+  },
+  images: [String] // çoxlu şəkil saxlayır
+});
+
+module.exports = mongoose.model("RealEstate", RealEstateSchema);

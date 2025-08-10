@@ -1,5 +1,12 @@
+import Katalog from "../Katalog";
+
 function Register() {
-    return <h2>Register</h2>;
+
+    return(<div>
+       
+        <h2>Register</h2>
+        </div>
+    ) 
 }
 
 export default Register;

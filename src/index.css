@@ -2,3 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+
+
+*{
+    font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", sans-serif;
+}
