@@ -10,7 +10,6 @@ export default function CreateRealEstate() {
     location: "",
     city: "",
     price: "",
-    data: "",
     images: [],
     description: "",
     contact: {
