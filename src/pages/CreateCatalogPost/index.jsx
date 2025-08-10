@@ -1,6 +1,6 @@
 import React from 'react'
 import Katalog from '../Katalog'
-import { Link } from 'react-router'
+import { Link } from 'react-router-dom'
 
 function CreateCatalogPost() {
     return (

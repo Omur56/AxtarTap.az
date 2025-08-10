@@ -1,7 +1,7 @@
 import Katalog from "../../Katalog";
 import TitleLogo from "../../../components/TitleLogo";
 import CreateClothing from "../../../components/CreateClothing";
-import { hasFormSubmit } from "@testing-library/user-event/dist/utils";
+
 
 
 function Geyimlər() {
@@ -9,7 +9,7 @@ function Geyimlər() {
         <div className="mx-auto  my-auto max-w-[1200px]"> 
             <TitleLogo />
             <Katalog />
-            <CreateClothing disabled={hasFormSubmit} />
+            <CreateClothing />
         </div>
     );
 };

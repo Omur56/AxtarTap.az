@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import {  useNavigate } from "react-router";
 import { categories } from "./Cateqories";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 
 
 

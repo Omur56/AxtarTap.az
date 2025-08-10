@@ -1,6 +1,6 @@
 import Katalog from "../../Katalog";
 import CreatePostForHomeAndGarden from "../../../components/CreatePostHome";
-import { hasFormSubmit }  from "@testing-library/user-event/dist/utils";
+
 import axios from "axios";
 import TitleLogo from "../../../components/TitleLogo";
 
@@ -14,7 +14,7 @@ function EvVəBag () {
        
 
         < Katalog />
-        <CreatePostForHomeAndGarden disabled={hasFormSubmit} />
+        <CreatePostForHomeAndGarden  />
        
     </div>
     )

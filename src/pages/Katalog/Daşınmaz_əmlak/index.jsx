@@ -1,7 +1,8 @@
 import TitleLogo from "../../../components/TitleLogo";
 import Katalog from "../../Katalog";
 import CreateRealEstate from "../../../components/CreateRealEstate";
-import { hasFormSubmit } from "@testing-library/user-event/dist/utils";
+
+// import userEvent from '@testing-library/user-event';
 
 
 function Daşınmaz_əmlak() {
@@ -9,7 +10,7 @@ function Daşınmaz_əmlak() {
         <div className="mx-auto  my-auto max-w-[1200px]">
             <TitleLogo />
             <Katalog />
-            <CreateRealEstate disabled={hasFormSubmit} />
+            <CreateRealEstate  />
             
         </div>
     )
