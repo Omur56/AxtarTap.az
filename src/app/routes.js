@@ -19,10 +19,16 @@ import Telefonlar from "../pages/Katalog/Telefonlar";
 import Daşınmaz_əmlak from "../pages/Katalog/Daşınmaz_əmlak";
 import Məişət_Texnikası from "../pages/Katalog/Məişət_Texnikası";
 import Ehtiyyat_hissələri_ve_aksesuarlar from "../pages/Katalog/Ehtiyyat_hissələri_ve_aksesuarlar";
-import PostDetail from "../pages/PostDetail";
+import PostDetail from "../pages/PostDetailHome";
 import PostDetalCar from "../pages/PostDetalCar";
 import CreateCatalogPost from "../pages/CreateCatalogPost";
-
+import PostDetailElectronika from "../pages/PostDetailElectronika";
+import PostDetailAcsesuar from "../pages/PostDetailAcsesuar";
+import PostRealEstate from "../pages/PostRealEstate";
+import PostDetailHousehold from "../pages/PostDetailHousehold";
+import PostDetailPhone from "../pages/PostDetailPhone";
+import PostDetailClothing from "../pages/PostDetailClothing";
+import PostDetailJewelry from "../pages/PostDetailJewelry";
 
 
 
@@ -74,8 +80,38 @@ const router = createBrowserRouter([
         Component: PostDetail,
       },
       
-       
+       {
+          path: "/PostDetailElectronika/:id",
+          Component: PostDetailElectronika,
+       },
+       {
+          path: "/PostDetailAcsesuar/:id",
+          Component: PostDetailAcsesuar,
+       },
 
+       {path: "/PostRealEstate/:id",
+       Component: PostRealEstate,
+
+       },
+
+       {
+        path: "/PostDetailHousehold/:id",
+        Component: PostDetailHousehold,
+       },
+       {
+        path: "/PostDetailPhone/:id",
+        Component: PostDetailPhone,
+
+       },
+
+       {
+        path: "/PostDetailClothing/:id",
+        Component: PostDetailClothing,
+       },
+       {
+        path: "/PostDetailJewelry/:id",
+        Component: PostDetailJewelry,
+       },
       {
         path: "/Katalog/Elektronika",
         Component: Elektronika,

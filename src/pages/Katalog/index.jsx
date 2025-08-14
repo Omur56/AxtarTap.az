@@ -12,7 +12,7 @@ const Katalog = () => {
   const [activeId, setActiveId] = useState(null);
   const navigate = useNavigate();
 
-  // ✅ localStorage-dən əvvəlki seçimi oxu
+
   useEffect(() => {
     const savedId = sessionStorage.getItem("selectedCategoryId");
     if (savedId) {
@@ -20,7 +20,7 @@ const Katalog = () => {
     }
   }, []);
 
-  // ✅ Seçimi yadda saxla
+
   const handleCategoryClick = (id, path) => {
     setActiveId(id);
     localStorage.setItem("selectedCategoryId", id);

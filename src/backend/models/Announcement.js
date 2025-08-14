@@ -5,9 +5,14 @@
 const mongoose = require("mongoose");
 
 const announcementSchema = new mongoose.Schema({
+  id: {
+    type: Number,
+    unique: true,
+  },
   category: String,
   brand: String,
   model: String,
+  ban_type: String,
   year: String,
   price: String,
   location: String,
@@ -18,6 +23,9 @@ const announcementSchema = new mongoose.Schema({
   engine: String,
   data: Date,
   description: String,
+
+   owner: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+
   contact: {
     name: String,
     email: String,
@@ -31,7 +39,11 @@ const announcementSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-});
+
+
+},
+{ timestamps: true }
+);
 
 
 module.exports = mongoose.model("Announcement", announcementSchema);

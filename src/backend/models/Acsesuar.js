@@ -3,6 +3,10 @@
 const mongoose = require("mongoose");
 
 const accessorySchema = new mongoose.Schema({
+  id: {
+    type: Number,
+    unique: true,
+  },
   title: String,
   brand: String,
   model: String,

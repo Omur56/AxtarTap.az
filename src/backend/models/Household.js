@@ -29,13 +29,17 @@ const mongoose = require("mongoose");
 
 
 const HouseHoldSchema = new mongoose.Schema({
+  id: {
+    type: Number,
+    unique: true,
+  },
   category: String,
   title: String,
   description: String,
   type_of_goods: String,
   location: String,
   price: String,
-  images: [String],   // burada massiv
+  images: [String],  
   contact: {
     name: String,
     email: String,

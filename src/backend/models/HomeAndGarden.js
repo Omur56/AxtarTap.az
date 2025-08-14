@@ -2,12 +2,17 @@
 const mongoose = require("mongoose");
 
 const HomeAndGardenSchema = new mongoose.Schema({
+ id: {
+    type: Number,
+    unique: true,
+  },
   category: String,
+  model: String,
   title: String,
   description: String,
   brand: String,
   price: String,
-  image: String, // Tam URL saxlayacağıq
+  images: [String], // Tam URL saxlayacağıq
   location: String,
   contact: {
     name: String,

@@ -7,12 +7,18 @@ const contactSchema = new mongoose.Schema({
 });
 
 const electronikaSchema = new mongoose.Schema({
-  title: { type: String, required: true },
+  id: {
+    type: Number,
+    unique: true,
+  },
+  category: String,
+  title: String,
+  // title: { type: String, required: true },
   brand: String,
   model: String,
   price: String,
   location: String,
-  images: [String], // şəkillərin URL-ləri
+  images: [String], 
   description: String,
   contact: contactSchema,
   liked: { type: Boolean, default: false },
