@@ -1,49 +1,47 @@
 
 
 // src/backend/models/Announcement.js
+import mongoose from "mongoose";
 
-const mongoose = require("mongoose");
-
-const announcementSchema = new mongoose.Schema({
-  id: {
-    type: Number,
-    unique: true,
+const announcementSchema = new mongoose.Schema(
+  {
+    id: {
+      type: Number,
+      unique: true,
+    },
+    category: String,
+    brand: String,
+    model: String,
+    ban_type: String,
+    year: String,
+    price: String,
+    location: String,
+    images: [String],
+    km: String,
+    motor: String,
+    transmission: String,
+    engine: String,
+    data: Date,
+    description: String,
+    owner: { type: mongoose.Schema.Types.ObjectId, ref: "User" },
+ 
+    contact: {
+      name: String,
+      email: String,
+      phone: String,
+      
+    },
+    liked: {
+      type: Boolean,
+      default: false,
+    },
+    favorite: {
+      type: Boolean,
+      default: false,
+    },
   },
-  category: String,
-  brand: String,
-  model: String,
-  ban_type: String,
-  year: String,
-  price: String,
-  location: String,
-  images: [String],
-  km: String,
-  motor: String,
-  transmission: String,
-  engine: String,
-  data: Date,
-  description: String,
-
-   owner: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
-
-  contact: {
-    name: String,
-    email: String,
-    phone: String,
-  },
-  liked: {
-    type: Boolean,
-    default: false,
-  },
-  favorite: {
-    type: Boolean,
-    default: false,
-  },
-
-
-},
-{ timestamps: true }
+  { timestamps: true }
 );
 
-
-module.exports = mongoose.model("Announcement", announcementSchema);
+const Announcement = mongoose.model("Announcement", announcementSchema);
+export default Announcement;

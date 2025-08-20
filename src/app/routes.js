@@ -1,15 +1,13 @@
 import { createBrowserRouter } from "react-router-dom";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
 import About from "../pages/About";
-import Users from "../pages/Users";
-import Dashboard from "../pages/Dashboard";
-import Settings from "../pages/Dashboard/Settings";
-import Analytics from "../pages/Dashboard/Analytics";
-import UsersDetails from "../pages/Users/UsersDetails";
+import Contact from "../pages/Contact";
+import Qaydalar from "../pages/Qaydalar";
+import Yardim from "../pages/Yardım";
+import Xidmetler from "../pages/Xidmetler";
 import RootLayout from "../components/Main";
 import Katalog from "../pages/Katalog";
-import Login from "../pages/Login";
 import Home from "../pages/Home";
-import Register from "../pages/Register";
 import Nəqliyyat from "../pages/Katalog/Neqliyyat";
 import EvVəBag from "../pages/Katalog/Ev_veBag";
 import Elektronika from "../pages/Katalog/Elektronika";
@@ -29,8 +27,14 @@ import PostDetailHousehold from "../pages/PostDetailHousehold";
 import PostDetailPhone from "../pages/PostDetailPhone";
 import PostDetailClothing from "../pages/PostDetailClothing";
 import PostDetailJewelry from "../pages/PostDetailJewelry";
+import PostDetailHome from "../pages/PostDetailHome";
+import PrivateRoute from "../components/PrivateRoute";
+import Search from "../pages/Search";
+import Login from "../pages/Login";
+import Reqister from "../pages/Reqister";
+import Profile from "../pages/Profile"; 
 
-
+import ResetPassword from "../pages/ResetPassword";
 
 const router = createBrowserRouter([
   <RootLayout />,
@@ -42,16 +46,7 @@ const router = createBrowserRouter([
         index: true,
         Component: Home,
       },
-    
-      {
-        path: "users",
-        Component: Users,
-      },
-      {
-        path: "users/:id",
-        Component: UsersDetails,
-      },
-    
+  
       {
         path: "/",
         Component: Home,
@@ -60,6 +55,10 @@ const router = createBrowserRouter([
         path: "/Katalog",
         Component: Katalog,
        
+      },
+      {
+        path: "/CreateCatalogPost",
+        Component: CreateCatalogPost,
       },
       {
         path: "/Katalog/Nəqliyyat",
@@ -79,7 +78,10 @@ const router = createBrowserRouter([
         path: "/elan/:id",
         Component: PostDetail,
       },
-      
+      {
+        path: "/PostDetalCar/:id",
+        Component: PostDetalCar,
+      },
        {
           path: "/PostDetailElectronika/:id",
           Component: PostDetailElectronika,
@@ -112,6 +114,10 @@ const router = createBrowserRouter([
         path: "/PostDetailJewelry/:id",
         Component: PostDetailJewelry,
        },
+       {
+        path: "/PostDetailHome/:id",
+        Component: PostDetailHome,
+       },
       {
         path: "/Katalog/Elektronika",
         Component: Elektronika,
@@ -142,43 +148,76 @@ const router = createBrowserRouter([
         Component: Ehtiyyat_hissələri_ve_aksesuarlar,
       },
     
-      {
-        path: "/register",
-        Component: Register,
-      },
-     
+    
       {
         path: "/about",
         Component: About,
       },
-      {
-        path: "/users",
-        Component: Users,
-      },
-      {
-        path: "/users/UsersDetails",
-        Component: UsersDetails,
-      },
-      {
-        path: "/dashboard",
-        Component: Dashboard,
-      },
-      {
-        path: "/dashboard/settings",
-        Component: Settings,
-      },
-      {
-        path: "/dashboard/analytics",
-        Component: Analytics,
-      },
-      {
-        path: "/login",
-        Component: Login,
-      },
      {
-      path: "/CreateCatalogPost",
-      Component: CreateCatalogPost,
-     }
+      path: "/contact",
+      Component: Contact, 
+     },
+     {
+      path: "/qaydalar",
+      Component: Qaydalar,
+     },
+
+    {
+      path: "/yardim",
+      Component: Yardim,
+    },
+    {
+      path: "/Xidmetler",
+      Component: Xidmetler,
+    },
+
+    {
+      path: "/login",
+      Component: Login,
+    },
+    {
+      path: "/reqister",
+      Component: Reqister,
+    },
+
+    {
+      path: "/search",
+      Component: Search,
+    },
+
+
+{
+   path: "/",
+          Component: () => {
+            <PrivateRoute>
+              <Home />
+            </PrivateRoute>
+          }
+},
+{
+   path: "/Profile",
+          Component: () => {
+            <PrivateRoute>
+              <Profile />
+            </PrivateRoute>
+          }
+},
+
+{
+  path: "/Profile",
+  Component: Profile,
+},
+
+
+
+
+{
+  path: "/reset-password/:token",
+   Component: ResetPassword,
+},
+ 
+    
+    
     ],
   },
 ]);

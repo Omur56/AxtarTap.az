@@ -17,7 +17,7 @@ export default function ProductDetails() {
 
 
                  useEffect(() => {
-    axios.get('http://localhost:5000/Phone/')
+    axios.get('http://localhost:5000/api/Phone/')
       .then(res => {
         console.log("Gələn data:", res.data);
         setPhone(res.data);
@@ -110,8 +110,7 @@ return (
       </Link>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white shadow-md rounded-xl p-4">
-        {/* Şəkillər Carousel */}
-        
+   
         <div className="space-y-4 flex flex-col ">
            <h1 className="text-2xl mb-5 font-bold capitalize">
             {post.category} {post.brand} {post.model} 
@@ -131,7 +130,6 @@ return (
           </Carousel>
         </div>
 
-        {/* Ətraflı məlumat */}
         <div className="space-y-3 mt-[60px]">
          
           <p className="text-[40px] font-black text-black-600 font-semibold">{post.price} AZN</p>

@@ -1,18 +1,13 @@
-import TitleLogo from '../../../components/TitleLogo';
-import  Katalog  from '../../Katalog';
-// import CreateJewelryPost from '../../../components/CreateJewelryPost';
-
-
+import TitleLogo from "../../../components/TitleLogo";
+import Katalog from "../../Katalog";
 
 function Zinət_əşyaları() {
-
-   
-    return (
-     <div className='mx-auto px-5 px-5 my-auto max-w-[1200px]'>
+  return (
+    <div className="mx-auto px-5 px-5 my-auto max-w-[1200px]">
       <TitleLogo />
-        < Katalog />
-       {/* <CreateJewelryPost /> */}
+      <Katalog />
     </div>
-    )};
-    
-  export default Zinət_əşyaları ;
+  );
+}
+
+export default Zinət_əşyaları;

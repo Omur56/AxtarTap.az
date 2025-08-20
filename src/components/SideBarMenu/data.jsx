@@ -7,6 +7,7 @@ import {
   FaEnvelope,
   FaThLarge,
    FaPlus,
+   FaSearch,
 } from "react-icons/fa";
 import { MdPersonAdd } from "react-icons/md";
 export const menuItems = [
@@ -26,19 +27,19 @@ export const menuItems = [
     id: 3,
     text: "Yeni Elan",
     url: "/CreateCatalogPost",
-    icon:<FaPlus /> ,
+    icon:<FaPlus size={30} /> ,
   },
   {
     id: 4,
     text: "Profil",
-    url: "/profile",
+    url: "/Login",
     icon: <FaUser />,
   },
   {
     id: 5,
-    text: "Qeydiyyat",
-    url: "/register",
-    icon: <MdPersonAdd size={24} />,
+    text: "Axtarış",
+    url: "/search",
+    icon: <FaSearch  />,
   },
   {
     id: 6,

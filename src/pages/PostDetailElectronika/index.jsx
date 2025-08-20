@@ -4,7 +4,7 @@ import axios from "axios";
 import { Carousel } from "react-responsive-carousel";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { Link } from "react-router-dom";
-import TitleLogo from "../../components/TitleLogo";
+
 
 
 
@@ -62,7 +62,7 @@ const [elektronikaPost, setElektronikaPost] = useState([]);
 
  
 
-  // Saat:dəqiqə formatı
+
   const getCurrentTime = (isoString) => {
     const date = new Date(isoString);
     return date.toTimeString().split(" ")[0].slice(0, 5);
@@ -79,11 +79,11 @@ const [elektronikaPost, setElektronikaPost] = useState([]);
 
    return(
     <div className="max-w-[1200px] mx-auto">
-       <TitleLogo />
+     
      <div className="max-w-5xl mx-auto p-6">
      
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white shadow-md rounded-xl p-4">
-      {/* Karusel – bütün şəkillər */}
+  
       <div className="space-y-4">
       <Carousel showThumbs={true} showStatus={false} autoPlay dynamicHeight={false} infiniteLoop>
         {electronikaPost.images?.length > 0 ? (
@@ -121,7 +121,7 @@ const [elektronikaPost, setElektronikaPost] = useState([]);
           
         </div>
         <div className=" flex items-center justify-between w-full h-[20px]">
-        <p className="text-sm text-black">Elanın nömrəsi:  {electronikaPost._id}</p>
+        <p className="text-sm text-black">Elanın nömrəsi:  {electronikaPost.id}</p>
         <p className="text-sm text-black">{electronikaPost.location},   {formatDate(electronikaPost.data)}, {getCurrentTime(electronikaPost.data)}</p>
         </div>
       </div>
@@ -131,7 +131,7 @@ const [elektronikaPost, setElektronikaPost] = useState([]);
             {[...elektronikaPost].reverse().map((item) => (
               <Link key={item._id} to={`/PostDetailElectronika/${item._id}`}>
                 <div className="border sm:w-[240.4px] max-w-[240.4px] h-[300px] rounded-lg bg-white shadow-md hover:shadow-xl transition duration-150">
-                  {/* Əsas səhifədə yalnız ilk şəkil */}
+                 
                   <img
                     src={
                       item.images?.[0]?.startsWith("http")

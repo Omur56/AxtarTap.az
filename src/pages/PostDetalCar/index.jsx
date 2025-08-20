@@ -49,7 +49,7 @@ export default function PostDetalCar() {
   if (loading) return <p>Yüklənir...</p>;
   if (notFound || !post) return <p>Elan tapılmadı.</p>;
 
-  // Şəkil array-i hazırlayırıq
+
 const imageArray = Array.isArray(post.images)
   ? post.images
   : post.images
@@ -97,7 +97,7 @@ const getCurrentTime = (isoString) => {
       </Link>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white shadow-md rounded-xl p-4">
-        {/* Şəkillər Carousel */}
+  
         
         <div className="space-y-4 flex flex-col ">
            <h1 className="text-2xl mb-5 font-bold capitalize">
@@ -118,7 +118,7 @@ const getCurrentTime = (isoString) => {
           </Carousel>
         </div>
 
-        {/* Ətraflı məlumat */}
+       
         <div className="space-y-3 mt-[60px]">
          
           <p className="text-[40px] font-black text-black-600 font-semibold">{post.price} AZN</p>
@@ -130,9 +130,9 @@ const getCurrentTime = (isoString) => {
             <li><span className="font-bold">Mühərrik növü: </span>{post.engine}</li>
             <li><span className="font-bold">Transmissiya: </span>{post.transmission}</li>
             <li><span className="font-bold">Yerləşmə: </span>{post.location}</li>
-            <li><span className="font-bold">Əlaqə nömrəsi: </span>{post?.contact.phone}</li>
-            <li><span className="font-bold">Ad: </span>{post?.contact.name}</li>
-            <li><span className="font-bold">Email: </span>{post?.contact.email}</li>
+            <li><span className="font-bold">Əlaqə nömrəsi: </span>{post?.contact?.phone}</li>
+            <li><span className="font-bold">Ad: </span>{post?.contact?.name}</li>
+            <li><span className="font-bold">Email: </span>{post?.contact?.email}</li>
             <li><span className="font-bold">Qeyd: </span>{post?.description}</li>
             
             
@@ -142,7 +142,7 @@ const getCurrentTime = (isoString) => {
         </div>
          <div className=" flex items-center justify-between w-full h-[20px]">
         <p className="text-sm text-black">Elanın nömrəsi:  {post.id}</p>
-        <p className="text-sm text-black">{post.location},   {formatDate(post.data)}, {getCurrentTime(post.data)}</p>
+        <p className="text-sm text-black">{post.location},   {formatDate(post?.data)}, {getCurrentTime(post?.data)}</p>
         </div>
       </div>
      
@@ -150,9 +150,9 @@ const getCurrentTime = (isoString) => {
     
 
       <h2 className="text-[25px] font-bold text-gray-400 mt-4">Bənzər elanlar</h2>
-      <div className=" p-4 rounded-[4px] grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-[15px] mt-10 w-full  bg-[#ffffff]">
+      <div className=" p-4 rounded-[4px] grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-[15px] mt-10 w-full  ">
         {[...cars].map((car) => (
-          <Link  key={car.id} to={`/cars/${car.id}` }>
+          <Link  key={car.id || car._id}  to={`/cars/${car.id}` }>
           <div 
             
             className="bg-white  rounded-[8px] sm:w-[240.4px]  max-w-[240.4px] h-[300px] shadow-md hover:shadow-xl hover:scale-5 transition duration-50"
@@ -170,7 +170,10 @@ const getCurrentTime = (isoString) => {
               <p className=" text-gray-600 truncate w-64">
                 {car.year}, {car.km} km
               </p>
+              <div className="flex items-center space-x-2"> 
+                
               <p className="capitalize text-gray-400 text-[16px]">{car.location}, {formatDate(car.data)} {getCurrentTime(car.data)} </p>
+            </div>
             </div>
           </div>
           </Link>

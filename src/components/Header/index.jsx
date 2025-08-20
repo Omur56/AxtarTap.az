@@ -1,40 +1,77 @@
-import { NavLink } from "react-router-dom";
-import { Outlet, useNavigate } from "react-router";
-import CustomButton from "../Button";
+
+
+
+
+import { useState } from "react";
+import { useNavigate } from "react-router";
 import TitleLogo from "../TitleLogo";
+import { FaSignInAlt, FaUserPlus, FaPlus, FaUser, FaSignOutAlt } from "react-icons/fa";
+import { Link } from "react-router-dom";
+function Header() {
+  const navigate = useNavigate();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
+  const handleLogin = () => {
+    // login prosesiniz bitdikdən sonra
+    setIsLoggedIn(true);
+    navigate("/"); // login olduqda əsas səhifəyə yönləndirmək
+  };
 
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    navigate("/"); // logout olduqda əsas səhifəyə yönləndirmək
+  };
 
-import Search from "../Search";
-
-
-
-
-
-
-function Header () {
-    const navigate = useNavigate();
-    return (
-        <header className="header ring-1 ring-green-500  mx-auto my-auto">  
-        <div className="flex justify-between items-center py-4 mx-auto my-auto max-w-[1200px]">
+  return (
+    <header className="header bg-gradient-to-r from-sky-700 to-green-500 mx-auto my-auto shadow-[0px_0px_10px_0px_rgba(0,0,0,0.5)] rounded-b-[10px]">  
+      <div className="flex justify-between items-center py-4 mx-auto my-auto max-w-[1200px]">
         <TitleLogo />
-       
-</div>  
-        
-      {/* <div className=" justify-end  flex mt-8 gap-[30px]  ">
-        <CustomButton title="Daxil ol" onClick={() => navigate("/login")} />
-        <CustomButton title="Qeydiyyat" onClick={() => navigate("/register")} />
-        <CustomButton path="/CreateCatalogPost" title="Elan ver"onClick={() => navigate("/CreateCatalogPost")}/>
-      </div> */}
 
-      
-      <Outlet />
-    
+        <div className="flex gap-3">
+          {!isLoggedIn && (
+            <>
+              <button
+                className="flex hidden md:flex transform ease-in-out duration-500 items-center text-[14px] font-[500] gap-2 bg-transparent border border-blue-500 text-white hover:text-white px-3 py-1 rounded-[4px] hover:bg-blue-500"
+                onClick={() => navigate("/login")}
+              >
+                <FaSignInAlt /> Daxil ol
+              </button>
+              <button
+                className="flex hidden md:flex transform ease-in-out duration-500 items-center text-[14px] font-[500] gap-2 bg-transparent border border-blue-500 text-white hover:text-white px-3 py-1 rounded-[4px] hover:bg-blue-500"
+                onClick={() => navigate("/reqister")}
+              >
+                <FaUserPlus /> Qeydiyyat
+              </button>
+            </>
+          )}
 
-        </header>
-        
-      
-    )
-};
+          {isLoggedIn && (
+            <>
+              <button
+                className="flex hidden md:flex transform ease-in-out duration-500 items-center text-[14px] font-[500] gap-2 bg-transparent border border-blue-500 text-white hover:text-white px-3 py-1 rounded-[4px] hover:bg-blue-500"
+                onClick={() => navigate("/profile")}
+              >
+                <FaUser /> Profil
+              </button>
+              <button
+                className="flex hidden md:flex transform ease-in-out duration-500 items-center text-[14px] font-[500] gap-2 bg-red-600 text-white px-3 py-1 rounded-[4px] hover:bg-red-400"
+                onClick={handleLogout}
+              >
+                <FaSignOutAlt /> Logout
+              </button>
+            </>
+          )}
+
+          <button
+            className="flex hidden md:flex items-center gap-2 bg-red-600 text-white px-4 py-2 rounded-[4px] hover:bg-red-400 transition"
+            onClick={() => navigate("/CreateCatalogPost")}
+          >
+            <FaPlus /> Yeni Elan
+          </button>
+        </div>
+      </div>  
+    </header>
+  );
+}
 
 export default Header;

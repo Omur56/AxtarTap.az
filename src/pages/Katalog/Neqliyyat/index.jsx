@@ -3,13 +3,12 @@ import axios from "axios";
 import Katalog from "../../Katalog";
 import CreatePost from "../../../components/CreatePostNeqliyyat";
 
-import TitleLogo from "../../../components/TitleLogo";
+
 
 export default function Neqliyyat() {
 
   return (
-    <div className="mx-auto  my-auto max-w-[1200px]">
-      <TitleLogo />
+    <div className="mx-auto  my-auto max-w-[1000px]">
       <Katalog />
      
    <CreatePost   />

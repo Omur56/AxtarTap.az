@@ -112,7 +112,7 @@ return (
       </Link>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white shadow-md rounded-xl p-4">
-        {/* Şəkillər Carousel */}
+      
         
         <div className="space-y-4 flex flex-col ">
            <h1 className="text-2xl mb-5 font-bold capitalize">
@@ -133,7 +133,6 @@ return (
           </Carousel>
         </div>
 
-        {/* Ətraflı məlumat */}
         <div className="space-y-3 mt-[60px]">
          
           <p className="text-[40px] font-black text-black-600 font-semibold">{post.price} AZN</p>
@@ -166,7 +165,7 @@ return (
       {[...accessories].reverse().map((item) => (
         <Link key={item._id} to={`/accessory/${item._id}`}>
           <div className="border sm:w-[240.4px] max-w-[240.4px] h-[300px] rounded-lg bg-white shadow-md hover:shadow-xl transition duration-150">
-            {/* Əsas səhifədə yalnız ilk şəkil */}
+          
             <img
               src={
                 item.images?.[0]?.startsWith("http")

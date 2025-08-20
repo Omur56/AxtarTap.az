@@ -1,37 +1,46 @@
-const express = require("express");
-const cors = require("cors");
-const bodyParser = require("body-parser");
-const multer = require("multer");
-const path = require("path");
-const dotenv = require("dotenv");
-const connectDB = require("./db");
+import express from "express";
+import cors from "cors";
+import multer from "multer";
+import path from "path";
+import dotenv from "dotenv";
+import connectDB from "./db.js";
+import Announcement from "./models/Announcement.js";
+import HomeAndGarden from "./models/HomeAndGarden.js";
+import Electronika from "./models/Electronika.js";
+import Accessory from "./models/Acsesuar.js";
+import RealEstate from "./models/RealEstate.js";
+import HouseHold from "./models/Household.js";
+import Phone from "./models/Phone.js";
+import Clothing from "./models/Clothing.js";
+import Jewelry from "./models/Jewelry.js";
+import User from "./models/user.js";
+import { fileURLToPath } from "url";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
+import { verifyToken } from "./middleware/verifyToken.js";
+import nodemailer from "nodemailer";
+import authRoutes from "./routes/auth.js";
 
-const Announcement = require("./models/Announcement");
-const HomeAndGarden = require("./models/HomeAndGarden");
-const Electronika = require("./models/Electronika");
-const Accessory = require("./models/Acsesuar");
-const RealEstate = require("./models/RealEstate");
-const HouseHold = require("./models/Household");
-const Phone = require("./models/Phone");
-const Clothing = require("./models/Clothing");
-const Jewelry = require("./models/Jewelry");
+// .env faylını oxu
+dotenv.config();
+connectDB();
+// Əgər __dirname lazımdırsa:
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 
 const app = express();
+
+
 // const PORT = 5000;
 
 
 
 const PORT = process.env.PORT || 5000;
 
-connectDB(process.env.MONGO_URI)
-  .then(() => app.listen(PORT, () => console.log("Server running on", PORT)))
-  .catch((e) => {
-    console.error("DB error", e);
-    process.exit(1);
-  });
 
-// 🔌 MongoDB-ə qoşu
-connectDB();
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -50,12 +59,17 @@ const upload = multer({
   limits: { fileSize: 5 * 1024 * 1024, files: 20 },
 });
 
-app.use(cors());
-app.use(bodyParser.json());
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-app.use("/api/auth", require("../backend/routes/auth"));
-app.use("/api/announcements", require("../backend/routes/announcements"));
 
+dotenv.config({ path: path.resolve("../.env") });
+
+// Routes
+
+
+
+app.use(cors());
+app.use(express.json()); 
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/api", authRoutes);
 
 
 async function idGenerator() {
@@ -69,6 +83,9 @@ async function idGenerator() {
   }
   return newId;
 }
+
+
+
 
 
 app.get("/api/cars/:id", async (req, res) => {
@@ -101,7 +118,9 @@ app.post("/api/cars", upload.array("images", 20 ), async (req, res) => {
   const newId = await idGenerator();
   try {
      const { id } = req.params;
+      
     const {
+     
     category,
     ban_type,
     brand,
@@ -117,7 +136,9 @@ app.post("/api/cars", upload.array("images", 20 ), async (req, res) => {
     favorite,
     engine,
     data,
+    
     description, } = req.body;
+    
     const contact = {
       name: req.body["contact.name"],
       email: req.body["contact.email"],
@@ -159,6 +180,11 @@ res.status(201).json(newAnn);
   res.status(500).json({error: err.message});
 }
 });
+
+
+
+// Multer upload və verifyToken middleware əvvəlcədən əlavə olunub
+
 
 app.put("/api/cars/:id", upload.array("images", 20), async (req, res) => {
    try {
@@ -1499,13 +1525,286 @@ app.delete("/api/Jewelry/images/:imageName", async (req, res) => {
 
 
 
-app.post("/api/banner", upload.single("banner"), (req, res) => {
-  res.json({ imageUrl: `/uploads/${req.file.filename}` });
+
+
+
+
+
+
+
+// VERIFY TOKEN
+
+
+app.post("/api/announcements", verifyToken, async (req, res) => {
+  try {
+    const newAnn = new Announcement({
+      ...req.body,
+      owner: req.userId,
+    });
+    await newAnn.save();
+    res.status(201).json(newAnn);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+// ROUTES
+// REGISTER
+// server.js və ya app.js
+app.post("/api/reqister", async (req, res) => {
+  try {
+    // password hash-lə
+    const hashedPassword = await bcrypt.hash(req.body.password, 10);
+
+    const newUser = new User({
+      username: req.body.username,
+      phone: req.body.phone,
+      email: req.body.email,
+      password: hashedPassword,
+      
+       // hash-lənmiş password saxlanır
+    });
+
+    await newUser.save();
+    res.status(201).json("User created successfully!");
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+
+// LOGIN
+app.post("/api/login", async (req, res) => {
+  try {
+    const user = await User.findOne({ email: req.body.email });
+    if (!user) return res.status(400).json("User not found");
+
+    const validPassword = await bcrypt.compare(req.body.password, user.password);
+    if (!validPassword) return res.status(400).json("Wrong password");
+
+    const token = jwt.sign({ id: user._id }, "SECRET_KEY", { expiresIn: "1d" });
+    res.json({ token, userId: user._id, username: user.username });
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+// CREATE ANNOUNCEMENT
+app.post("/api/announcements", verifyToken, async (req, res) => {
+  try {
+    const newAnn = new Announcement({
+      ...req.body,
+      owner: req.userId,
+    });
+    await newAnn.save();
+    res.status(201).json(newAnn);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+// UPDATE ANNOUNCEMENT
+app.put("/api/announcements/:id", verifyToken, async (req, res) => {
+  try {
+    const ann = await Announcement.findById(req.params.id);
+    if (!ann) return res.status(404).json("Not found");
+
+    if (ann.owner.toString() !== req.userId) {
+      return res.status(403).json("You can only edit your own announcements");
+    }
+
+    const updated = await Announcement.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+
+
+// profil üçün
+app.get("/api/users/:id", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select("-password"); // password göndərmə
+    if (!user) return res.status(404).json("User not found");
+    res.json(user);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+
+app.get("/api/announcements",verifyToken, async (req, res) => {
+  try {
+    const announcements = await Announcement.find().populate("owner", "username");
+    res.json(announcements);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+
+
+app.put("/api/announcements/:id", verifyToken, async (req, res) => {
+  try {
+    const ann = await Announcement.findById(req.params.id);
+    if (!ann) return res.status(404).json("Not found");
+
+    if (ann.owner.toString() !== req.userId)
+      return res.status(403).json("You can only edit your own announcements");
+
+    const updated = await Announcement.findByIdAndUpdate(req.params.id, req.body, { new: true });
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+// Elanı sil
+app.delete("/api/announcements/:id", verifyToken, async (req, res) => {
+  try {
+    const ann = await Announcement.findById(req.params.id);
+    if (!ann) return res.status(404).json("Not found");
+
+    if (ann.owner.toString() !== req.userId)
+      return res.status(403).json("You can only delete your own announcements");
+
+    await Announcement.findByIdAndDelete(req.params.id);
+    res.json("Deleted successfully");
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+
+
+app.get("/api/users/:id", verifyToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select("-password"); // password göndərmə
+    if (!user) return res.status(404).json("User not found");
+    res.json(user);
+  } catch (err) {
+    res.status(500).json(err);
+  }
 });
 
 
 
 
+// // Nodemailer transporter
+// const transporter = nodemailer.createTransport({
+//   service: "gmail",
+//   auth: {
+//     user: process.env.EMAIL_USER,
+//     pass: process.env.EMAIL_PASS
+//   }
+// });
+
+// // ------------------- RESET PASSWORD -------------------
+// app.post("/api/reset-password", async (req, res) => {
+//   const { identifier } = req.body; // username/email/phone
+//   try {
+//     // 1️⃣ İstifadəçini tap
+//     const user = await User.findOne({
+//       $or: [
+//         { username: identifier },
+//         { email: identifier },
+//         { phone: identifier }
+//       ]
+//     });
+
+//     if (!user) return res.status(404).json({ message: "İstifadəçi tapılmadı!" });
+
+//     // 2️⃣ Yeni şifrə yarat
+//     const newPassword = Math.random().toString(36).slice(-8); // 8 simvol
+//     const hashedPassword = await bcrypt.hash(newPassword, 10);
+//     user.password = hashedPassword;
+//     await user.save();
+
+//     // 3️⃣ Email göndər
+//     await transporter.sendMail({
+//       from: `"AxtarTap" <${process.env.EMAIL_USER}>`,
+//       to: user.email,
+//       subject: "Şifrə Bərpası",
+//       text: `Salam ${user.username},\n\nYeni şifrəniz: ${newPassword}\n\nTəşəkkürlər!`
+//     });
+
+//     res.json({ message: "Yeni şifrəniz email ünvanınıza göndərildi!" });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ message: "Server xətası" });
+//   }
+// });
+
+
+
+
+
+
+
+
+
+
+// sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
+// // Şifrə bərpa mail göndərmək
+// app.post("/forgot-password", async (req, res) => {
+//   try {
+//     const { email } = req.body;
+//     const user = await User.findOne({ email });
+
+//     if (!user) {
+//       return res.status(404).json({ message: "İstifadəçi tapılmadı" });
+//     }
+
+//     // Token yaradılır (1 saat etibarlı)
+//     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+//       expiresIn: "1h",
+//     });
+
+//     // Link
+//     const resetLink = `http://localhost:3000/reset-password/${token}`;
+
+//     const msg = {
+//       to: email,
+//       from: "sənin_emailin@domain.com", // SendGrid təsdiqlənmiş email
+//       subject: "Şifrəni sıfırla",
+//       html: `
+//         <h2>Salam, ${user.username}</h2>
+//         <p>Şifrənizi bərpa etmək üçün linkə klikləyin:</p>
+//         <a href="${resetLink}">${resetLink}</a>
+//         <p>Link 1 saat keçərli olacaq.</p>
+//       `,
+//     };
+
+//     await sgMail.send(msg);
+
+//     res.json({ message: "Bərpa linki emailinizə göndərildi" });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ message: "Server xətası" });
+//   }
+// });
+
+// // Yeni şifrə təyin etmək
+// app.post("/reset-password/:token", async (req, res) => {
+//   try {
+//     const { token } = req.params;
+//     const { password } = req.body;
+
+//     const decoded = jwt.verify(token, process.env.JWT_SECRET);
+//     const user = await User.findById(decoded.id);
+
+//     if (!user) return res.status(404).json({ message: "İstifadəçi tapılmadı" });
+
+//     user.password = password; // hash etməyi unutma
+//     await user.save();
+
+//     res.json({ message: "Şifrə uğurla dəyişdirildi" });
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ message: "Token etibarsız və ya vaxtı bitib" });
+//   }
+// });
 
 
 app.listen(PORT, () => {

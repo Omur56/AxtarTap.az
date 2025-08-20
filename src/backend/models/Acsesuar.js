@@ -1,6 +1,4 @@
-
-
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const accessorySchema = new mongoose.Schema({
   id: {
@@ -24,5 +22,5 @@ const accessorySchema = new mongoose.Schema({
   data: { type: Date, default: Date.now }
 });
 
-
-module.exports = mongoose.model("Accessory", accessorySchema);
+const Accessory = mongoose.model("Accessory", accessorySchema);
+export default Accessory;

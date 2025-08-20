@@ -1,4 +1,3 @@
-import Katalog from "../Katalog";
 import React, { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import axios from "axios";
@@ -11,6 +10,24 @@ export default function PostDetail() {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
 
+
+    const [home, setHome] = useState([]);
+
+
+
+    useEffect(() => {
+    const fetchCars = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/homGarden/");
+        setHome(res.data);
+      } catch (err) {
+        console.error("Elanlar yüklənmədi:", err);
+      }
+    };
+
+    fetchCars();
+  }, []);
+  
   useEffect(() => {
     axios
       .get(`http://localhost:5000/api/homGarden/${id}`)
@@ -28,7 +45,7 @@ export default function PostDetail() {
   if (loading) return <p>Yüklənir...</p>;
   if (notFound || !post) return <p>Elan tapılmadı.</p>;
 
-  // Şəkil array-i hazırlayırıq
+
 const imageArray = Array.isArray(post.images)
   ? post.images
   : post.images
@@ -69,18 +86,18 @@ const getCurrentTime = (isoString) => {
 
   return (
     <div className="max-w-5xl mx-auto p-6">
-      <Katalog />
-
-      <Link
-        to="/Katalog/Ev_veBag"
-        className="text-blue-500 underline mb-4 inline-block"
-      >
-        ← Geri
-      </Link>
+      
+      <Link to="/Katalog/Ev_veBag"> <button class="flex mb-4 items-center gap-2 bg-gray-200 hover:bg-gray-300 text-gray-800 px-4 py-2 rounded-md">
+                  
+                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" />
+                  </svg>
+                  Geri
+                </button></Link>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-white shadow-md rounded-xl p-4">
         <div className="space-y-4">
-        {/* 🖼️ Karusel */}
+     
         {[...imageArray] && imageArray.length > 0 ? (
           <Carousel
     showThumbs={true}
@@ -104,7 +121,7 @@ const getCurrentTime = (isoString) => {
         )}
         </div>
 
-        {/* 📄 Elan detalları */}
+     
         <div className="space-y-3">
         <h1 className="text-2xl font-bold capitalize">{post.title}, {post.brand}, {post.model}</h1>
          <p className="text-xl text-green-600 font-semibold">
@@ -131,6 +148,32 @@ const getCurrentTime = (isoString) => {
         </div>
       </div>
       
+
+       <h2 className="text-[25px] font-bold text-gray-400 mt-4">Bənzər elanlar</h2>
+            <div className=" p-4 rounded-[4px] grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-[15px] mt-10 w-full ">
+              {[...home].map((homegarden) => (
+                <Link  key={homegarden._id} to={`/PostDetailHome/${homegarden._id}` }>
+                <div 
+                  
+                  className="bg-white  rounded-[8px] sm:w-[240.4px]  max-w-[240.4px] h-[300px] shadow-md hover:shadow-xl hover:scale-5 transition duration-500"
+                >
+                  <div className="w-full h-[178.5px]  bg-gray-100 relative">
+                    <img
+                      src={homegarden.images[0]}
+                      alt={homegarden.brand}
+                      className="absolute top-0 left-0 w-full h-full object-cover rounded-t-[8px]"
+                    />
+                  </div>
+                  <div className="p-2 ">
+                    <h3 className="text-xl font-bold font-black text-black">{homegarden.price} AZN ₼</h3>
+                    <h2 className="text-lg  truncate w-50">{homegarden.title}, {homegarden.brand}, {homegarden.model}</h2>
+                 
+                    <p className="capitalize text-gray-400 text-[16px]">{homegarden.location}, {formatDate(homegarden.data)} {getCurrentTime(homegarden.data)} </p>
+                  </div>
+                </div>
+                </Link>
+              ))}
+            </div>
       </div>
     
   );

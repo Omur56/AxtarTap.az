@@ -1,20 +1,21 @@
-import { Outlet, useNavigate } from "react-router";
+import {Outlet,  useNavigate } from "react-router";
 import Footer from "../Footer";
 import BottomMenu from "../MobileMenu";
-import SideBarMenu from "../SideBarMenu";
+import Header from "../Header";
+
 
 
 const RootLayout = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="flex flex-col min-h-screen max-w-full mx-auto my-auto  bg-[#ffffff] ">
+   <div className=" bg-gradient-to-r from-blue-50 via-purple-50 to-pink-50">
+       <Header />
       
-      <SideBarMenu />
       <Outlet />
-      <Footer />
+       <Footer/>
       <BottomMenu />
-    </div>
+   </div>
   );
 };
 
