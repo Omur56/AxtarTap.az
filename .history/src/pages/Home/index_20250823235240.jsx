@@ -682,7 +682,7 @@ const Home = () => {
       </div>
 
 
-      <div className="w-1/6 hidden md:block  sticky top-4 bg-white h-screen b p-2">
+      <div className="w-1/6  sticky top-4 bg-white h-screen b p-2">
         {ads.slice(0, 1).map((ad) => (
           <a key={ad._id} href={ad.link} target="_blank" rel="noreferrer">
             <img
