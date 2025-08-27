@@ -43,8 +43,9 @@ const app = express();
 const PORT = process.env.PORT || 5000;
 
 
-
-
+const userRoutes = require("./userRoutes.js");
+// const announcementRoutes = require("./announcementRoutes");
+const authMiddleware = require("./middleware/auth");
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, path.join(__dirname, "uploads"));
@@ -75,7 +76,8 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api", authRoutes);
 app.use("/api/ads", adsRouter);
 app.use("/api/stats", statsRouter);
-
+app.use("/api/users", authMiddleware, userRoutes);
+app.use("/api/announcements", authMiddleware, announcementRoutes);
 app.use("/uploads", express.static("uploads")); 
 async function idGenerator() {
   let unique = false;
@@ -1695,7 +1697,15 @@ app.delete("/api/announcements/:id", verifyToken, async (req, res) => {
 
 
 
-
+app.get("/api/users/:id", async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ message: "User not found" });
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
 
 
 

@@ -44,7 +44,7 @@ const PORT = process.env.PORT || 5000;
 
 
 
-
+const authMiddleware = require("./middleware/auth");
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, path.join(__dirname, "uploads"));

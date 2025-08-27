@@ -194,14 +194,10 @@ const router = createBrowserRouter([
           </PrivateRoute>;
         },
       },
-      // {
-      //   path: "/Profile",
-      //   Component: () => {
-      //     <PrivateRoute>
-      //       <Profile />
-      //     </PrivateRoute>;
-      //   },
-      // },
+      {
+        path: "/Profile",
+        Component: Profile
+      },
 
       {
         path: "/Profile",

@@ -185,6 +185,7 @@ const router = createBrowserRouter([
         path: "/AdminPanel",
         Component: Admin,
       },
+      
 
       {
         path: "/",
@@ -194,19 +195,9 @@ const router = createBrowserRouter([
           </PrivateRoute>;
         },
       },
-      // {
-      //   path: "/Profile",
-      //   Component: () => {
-      //     <PrivateRoute>
-      //       <Profile />
-      //     </PrivateRoute>;
-      //   },
-      // },
+     
 
-      {
-        path: "/Profile",
-        Component: Profile,
-      },
+     
     ],
   },
 ]);

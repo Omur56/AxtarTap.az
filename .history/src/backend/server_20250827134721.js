@@ -13,7 +13,7 @@ import HouseHold from "./models/Household.js";
 import Phone from "./models/Phone.js";
 import Clothing from "./models/Clothing.js";
 import Jewelry from "./models/Jewelry.js";
-import User from "./models/user.js";
+import User from "./models/user.";
 import { fileURLToPath } from "url";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";

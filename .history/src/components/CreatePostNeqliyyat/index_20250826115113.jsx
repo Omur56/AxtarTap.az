@@ -506,7 +506,7 @@ export default function CreatePost() {
       <CircularProgress />
     </Box>}
           {loading && results.length === 0 && (
-            <p>Elan Tapılmadı</p>
+            <p></p>
           )}
 
           {!loading && results.length > 0 && (
