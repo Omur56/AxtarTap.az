@@ -14,20 +14,39 @@
 
 // export default verifyToken;
 // verifyToken.js
+// import jwt from "jsonwebtoken";
+
+// export const verifyToken = (req, res, next) => {
+//   const authHeader = req.headers.authorization;
+//   if (!authHeader) return res.status(401).json("You are not authenticated");
+
+//   // Bearer varsa ayır, yoxsa birbaşa token
+//   const token = authHeader.startsWith("Bearer ") ? authHeader.split(" ")[1] : authHeader;
+
+//   try {
+//     const decoded = jwt.verify(token, "SECRET_KEY");
+//     req.userId = decoded.id;
+//     next();
+//   } catch (err) {
+//     return res.status(403).json("Token is invalid");
+//   }
+// };
+
+
 import jwt from "jsonwebtoken";
 
 export const verifyToken = (req, res, next) => {
   const authHeader = req.headers.authorization;
-  if (!authHeader) return res.status(401).json("You are not authenticated");
+  if (!authHeader) return res.status(401).json("Access Denied");
 
-  // Bearer varsa ayır, yoxsa birbaşa token
-  const token = authHeader.startsWith("Bearer ") ? authHeader.split(" ")[1] : authHeader;
+  const token = authHeader.split(" ")[1];
+  if (!token) return res.status(401).json("Access Denied");
 
   try {
-    const decoded = jwt.verify(token, "SECRET_KEY");
-    req.userId = decoded.id;
+    const verified = jwt.verify(token, "SECRET_KEY");
+    req.userId = verified.id;
     next();
   } catch (err) {
-    return res.status(403).json("Token is invalid");
+    res.status(401).json("Invalid Token");
   }
 };

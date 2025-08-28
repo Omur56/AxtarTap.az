@@ -421,7 +421,7 @@ const Home = () => {
                         {car.category}, {car.brand}, {car.model}
                       </h2>
                       <p className="text-gray-600 truncate w-64">
-                        {car.year}, {car.km} km
+                        {car.year},{car.motor} {car.km} km
                       </p>
                       <p className="capitalize text-gray-400 text-[16px]">
                         {car.location}, {formatDate(car.data)}{" "}

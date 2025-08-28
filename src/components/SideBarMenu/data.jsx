@@ -32,7 +32,7 @@ export const menuItems = [
   {
     id: 4,
     text: "Profil",
-    url: "/Login",
+    url: "/profile",
     icon: <FaUser />,
   },
   {

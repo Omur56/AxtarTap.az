@@ -24,6 +24,12 @@ import authRoutes from "./routes/auth.js";
 import Ad from "./models/Ad.js"
 import adsRouter from "./routes/ads.js";
 import statsRouter from "./routes/stats.js";
+import announcementRoutes from "./routes/announcements.js";
+import bodyParser from "body-parser";
+import twilio from "twilio";
+// import otpRoutes from "./routes/otp.js";
+
+
 // .env faylını oxu
 dotenv.config();
 connectDB();
@@ -75,8 +81,10 @@ app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 app.use("/api", authRoutes);
 app.use("/api/ads", adsRouter);
 app.use("/api/stats", statsRouter);
-
+app.use("/api/announcements", announcementRoutes);
 app.use("/uploads", express.static("uploads")); 
+// app.use(bodyParser.json());
+// app.use("/api", otpRoutes);
 async function idGenerator() {
   let unique = false;
   let newId;
@@ -89,6 +97,51 @@ async function idGenerator() {
   return newId;
 }
 
+
+
+const client = twilio(process.env.TWILIO_ACCOUNT_SID, process.env.TWILIO_AUTH_TOKEN);
+
+// OTP saxlanması üçün sadə yaddaş (real app-da DB istifadə et)
+const otpStore = {}; // { phoneNumber: { otp: 1234, expires: Date } }
+
+
+
+
+
+// OTP göndərmək
+app.post("/api/send-otp", async (req, res) => {
+  const { phone } = req.body;
+  if (!phone) return res.status(400).json({ message: "Telefon nömrəsi tələb olunur" });
+
+  const otp = Math.floor(100000 + Math.random() * 900000); // 6 rəqəmli kod
+  otpStore[phone] = { otp, expires: Date.now() + 5 * 60 * 1000 }; // 5 dəqiqəlik OTP
+
+  try {
+    await client.messages.create({
+      body: `Sizin OTP kodunuz: ${otp}`,
+      from: process.env.TWILIO_PHONE_NUMBER,
+      to: phone
+    });
+    res.json({ message: "OTP göndərildi" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "OTP göndərilə bilmədi" });
+  }
+});
+
+// OTP təsdiqləmək
+app.post("/api/verify-otp", (req, res) => {
+  const { phone, otp } = req.body;
+  if (!phone || !otp) return res.status(400).json({ message: "Telefon və OTP tələb olunur" });
+
+  const record = otpStore[phone];
+  if (!record) return res.status(400).json({ message: "OTP tapılmadı" });
+  if (Date.now() > record.expires) return res.status(400).json({ message: "OTP vaxtı bitib" });
+  if (Number(otp) !== record.otp) return res.status(400).json({ message: "OTP səhvdir" });
+
+  delete otpStore[phone]; // OTP istifadə olundu
+  res.json({ message: "Telefon təsdiqləndi" });
+});
 
 
 
@@ -1680,23 +1733,27 @@ app.delete("/api/announcements/:id", verifyToken, async (req, res) => {
 });
 
 
-// app.get("/api/users/:id", verifyToken, async (req, res) => {
-//   try {
-//     const user = await User.findById(req.params.id).select("-password"); // password göndərmə
-//     if (!user) return res.status(404).json("User not found");
-//     res.json(user);
-//   } catch (err) {
-//     res.status(500).json(err);
-//   }
-// });
+app.get("/api/users/:id", verifyToken, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id).select("-password"); // password göndərmə
+    if (!user) return res.status(404).json("User not found");
+    res.json(user);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
 
 
 
 
-
-
-
-
+app.get("/api/announcements/my-announcements", verifyToken, async (req, res) => {
+  try {
+    const myAnnouncements = await Announcement.find({ owner: req.userId });
+    res.json(myAnnouncements);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
 
 
 app.listen(PORT, () => {

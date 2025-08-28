@@ -4,34 +4,55 @@ import { useNavigate  } from "react-router-dom";
 import { Link } from "react-router-dom";
 
 
-export default function Login() {
+export default function Login({ onLogin }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [auth, setAuth] = useState(null); // burada setAuth yaradılır
   const navigate = useNavigate();
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await axios.post("http://localhost:5000/api/login", {
-        email,
-        password
-      });
-      setAuth(res.data.token); // indi səhv verməyəcək
-      localStorage.setItem("token", res.data.token);
-       localStorage.setItem("username", res.data.username); 
-             localStorage.setItem("username", res.data.username); // profil üçün
-      localStorage.setItem("userId", res.data.userId);
-      navigate("/");
-      console.log("Login successful:", res.data);
-    } catch (err) {
-      console.error("Login failed:", err.response?.data || err.message);
-    }
-  };
+//   const handleLogin = async (e) => {
+//     e.preventDefault();
+//     try {
+//       const res = await axios.post("http://localhost:5000/api/login", {
+//         email,
+//         password
+//       });
+//       setAuth(res.data.token); // indi səhv verməyəcək
+//       localStorage.setItem("token", res.data.token);
+//        localStorage.setItem("username", res.data.username); 
+//              localStorage.setItem("username", res.data.username); // profil üçün
+//       localStorage.setItem("userId", res.data.userId);
+//       navigate("/");
+//       console.log("Login successful:", res.data);
+//     } catch (err) {
+//       console.error("Login failed:", err.response?.data || err.message);
+//     }
+//   };
+
+
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    const res = await axios.post("http://localhost:5000/api/login", {
+      email,
+      password
+    });
+
+    // Token və user məlumatlarını localStorage-a yaz
+    localStorage.setItem("token", res.data.token);
+    localStorage.setItem("userId", res.data.userId);
+    localStorage.setItem("username", res.data.username);
+
+    console.log("Login uğurlu:", res.data);
+    navigate("/profile"); // login sonrası səhifəyə yönləndir
+  } catch (err) {
+    console.error("Login xətası:", err.response?.data || err.message);
+  }
+};
 
   return (
     <div className="min-h-[58.4vh]">
     <form 
-  onSubmit={handleLogin} 
+  onSubmit={handleSubmit} 
   className="max-w-md    mx-auto mt-16 mb-10 bg-white shadow-lg rounded-xl p-8 space-y-5"
 >
   <h2 className="text-2xl font-bold text-center text-gray-800">Daxil Ol</h2>
@@ -72,4 +93,5 @@ export default function Login() {
 </div>
   );
 }
+
 

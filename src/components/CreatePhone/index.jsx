@@ -304,6 +304,22 @@ export default function CreatePhone() {
     fetchAll();
   }, []);
 
+
+  const token = localStorage.getItem("token");
+
+// Yeni funksiyanı elanı açan buttona əlavə edirik
+const handleOpenForm = () => {
+  if (!token) {
+    Swal.fire({
+      icon: "warning",
+      title: "Giriş tələb olunur",
+      text: "Elan paylaşmaq üçün hesabınıza daxil olun.",
+      confirmButtonColor: "#3085d6",
+    });
+    return;
+  }
+  setIsOpen(true);
+};
   return (
     <div className="min-h-screen ">
       <div className="p-6 max-w-5xl mx-auto">
@@ -360,7 +376,7 @@ export default function CreatePhone() {
         <h2 className="text-2xl font-bold mb-4">Telefon Elanları</h2>
         <div className="p-4">
           <button
-            onClick={() => setIsOpen(true)}
+            onClick={handleOpenForm}
             className="px-4 py-2 bg-blue-600 text-white rounded-lg shadow-md"
           >
             Elan yerləşdirmək üçün formu aç

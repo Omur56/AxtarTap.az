@@ -1,25 +1,24 @@
-
-
-
-
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import TitleLogo from "../TitleLogo";
 import { FaSignInAlt, FaUserPlus, FaPlus, FaUser, FaSignOutAlt } from "react-icons/fa";
-import { Link } from "react-router-dom";
+
 function Header() {
   const navigate = useNavigate();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const handleLogin = () => {
-    // login prosesiniz bitdikdən sonra
-    setIsLoggedIn(true);
-    navigate("/"); // login olduqda əsas səhifəyə yönləndirmək
-  };
+  // Page load zamanı localStorage yoxlanılır
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) setIsLoggedIn(true);
+  }, []);
 
   const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+    localStorage.removeItem("username");
     setIsLoggedIn(false);
-    navigate("/"); // logout olduqda əsas səhifəyə yönləndirmək
+    navigate("/"); // logout sonrası əsas səhifəyə yönləndir
   };
 
   return (
