@@ -37,6 +37,7 @@ import Admin from "../pages/AdminPanel";
 import AdsPanel from "../pages/AdsPanel";
 import AdminLogin from "../pages/AdminLogin";
 import MyHomeAndGarden from "../backend/models/HomeAndGarden";
+import AdDetail from "../pages/AdDetail";
 const router = createBrowserRouter([
   <RootLayout />,
   {
@@ -194,6 +195,10 @@ const router = createBrowserRouter([
       {
         path: "/admin/login",
          Component: AdminLogin,
+      },
+      {
+        path: "/ads/:id",
+        Component: AdDetail, 
       },
 
       {

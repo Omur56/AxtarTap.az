@@ -582,7 +582,7 @@ const handleOpenForm = () => {
             ))
           ) : (
             <>
-              {[...homGardenItems].reverse().map((item) => (
+              {homGardenItems.map((item) => (
                 <Link target="_blank"
             rel="noopener noreferrer" key={item._id} to={`/PostDetailHome/${item._id}`}>
                   <div className="flex flex-col w-[226px] h-[304px]  shadow-md rounded-2xl bg-white hover:shadow-xl">
