@@ -22,11 +22,16 @@ import dotenv from "dotenv";
 
 dotenv.config();
 
-const uri = process.env.MONGO_URI || "mongodb+srv://Omur9696:elanlar123@cluster0.pyjgrvq.mongodb.net/elanlar?retryWrites=true&w=majority&appName=Cluster0";
+const uri =
+  process.env.MONGO_URI ||
+  "mongodb+srv://Omur9696:elanlar123@cluster0.pyjgrvq.mongodb.net/elanlar?retryWrites=true&w=majority&appName=Cluster0";
 
 const connectDB = async () => {
   try {
-  mongoose.connect(uri);
+    await mongoose.connect(uri, {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
     console.log("✅ MongoDB bağlantısı uğurludur");
   } catch (err) {
     console.error("❌ MongoDB bağlantı xətası:", err);

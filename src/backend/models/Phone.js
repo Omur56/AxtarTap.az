@@ -1,10 +1,7 @@
 import mongoose from "mongoose";
 
 const phoneSchema = new mongoose.Schema({
-  id: {
-    type: Number,
-    unique: true,
-  },
+
   title: String,
   brand: String,
   model: String,
@@ -16,6 +13,8 @@ const phoneSchema = new mongoose.Schema({
   sim_card: String,
   images: [String],
   description: String,
+   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+
   contact: {
     name: String,
     email: String,

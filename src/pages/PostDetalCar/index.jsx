@@ -267,7 +267,7 @@ export default function PostDetailCar() {
       <div className="p-4 grid justify-items-center grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-[15px] w-full">
         {[...cars].map((car) => (
           <Link  target="_blank"
-            rel="noopener noreferrer" key={car.id || car._id} to={`/cars/${car.id}` }>
+            rel="noopener noreferrer" key={car._id || car.id} to={`/cars/${car._id}` }>
             <div className="bg-white rounded-2xl sm:w-[240.4px] max-w-[240.4px] h-[300px] shadow-md hover:shadow-xl transition duration-200">
               <div className="w-full h-[178.5px] bg-gray-100 relative">
                 <img

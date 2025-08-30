@@ -67,55 +67,39 @@ export default function CreateElectronikaPost() {
   };
 
   // Form submit olunduqda
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+ const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    const formData = new FormData();
+  const formData = new FormData();
 
-    // şəkilləri formData-ya əlavə etmək üçün 
-    images.forEach((file) => formData.append("images", file));
+  images.forEach((file) => formData.append("images", file));
 
-    // digər sahələri əlavə etmək üçün 
-    Object.entries(elektronikaPost).forEach(([key, value]) => {
-      if (key === "images" || key === "data") return; 
-      if (key === "contact") {
-        Object.entries(value).forEach(([k, v]) =>
-          formData.append(`contact.${k}`, v)
-        );
-      } else {
-        formData.append(key, value);
-      }
-    });
+  formData.append("title", elektronikaPost.title);
+  formData.append("brand", elektronikaPost.brand);
+  formData.append("model", elektronikaPost.model);
+  formData.append("price", elektronikaPost.price);
+  formData.append("location", elektronikaPost.location);
+  formData.append("description", elektronikaPost.description);
+  formData.append("contact", JSON.stringify(elektronikaPost.contact));
+  formData.append("data", elektronikaPost.data.toISOString());
 
-    formData.append("data", elektronikaPost.data.toISOString());
-
-    try {
-      if (editingId) {
-        await axios.put(
-          `http://localhost:5000/api/electronika/${editingId}`,
-          formData
-        );
-        setEditingId(null);
-      } else {
-        await axios.post("http://localhost:5000/api/electronika", formData);
-        Swal.fire({
-          icon: "success",
-          title: "Elanınız uğurla yerləşdirildi!",
-          confirmButtonColor: "#3085d6",
-        });
-      }
-      resetForm();
-      fetchItems();
-    } catch (err) {
-      console.error(err);
-      Swal.fire({
-        icon: "error",
-        title: "Xəta baş verdi",
-        text: err.response?.data?.message || "Server xətası",
-        confirmButtonColor: "#d33",
-      });
+  try {
+    const headers = { Authorization: `Bearer ${localStorage.getItem("token")}` };
+    if (editingId) {
+      await axios.put(`http://localhost:5000/api/electronika/${editingId}`, formData, { headers });
+      setEditingId(null);
+    } else {
+      await axios.post("http://localhost:5000/api/electronika", formData, { headers });
+      Swal.fire({ icon: "success", title: "Elan uğurla yerləşdirildi!" });
     }
-  };
+    resetForm();
+    fetchItems();
+  } catch (err) {
+    console.error(err.response?.data || err.message);
+    Swal.fire({ icon: "error", title: "Xəta baş verdi", text: err.response?.data?.message || "Server xətası" });
+  }
+};
+
 
   // Formu sıfırlamaq üçün
   const resetForm = () => {

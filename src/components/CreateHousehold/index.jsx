@@ -69,52 +69,50 @@ export default function CreateHousehold() {
     }
   };
 
-  const handleSubmit = async (e) => {
+ const handleSubmit = async (e) => {
   e.preventDefault();
 
   const formData = new FormData();
-
- 
   images.forEach((file) => formData.append("images", file));
 
-  const { contact, ...rest } = household;
-
- 
-
   Object.entries(household).forEach(([key, value]) => {
-      if (key === "data") return;
-      if (key === "contact") {
-        Object.entries(value).forEach(([k, v]) =>
-          formData.append(`contact.${k}`, v)
-        );
-      } else if (key === "images") {
-        household.images.forEach((file) => {
-          formData.append("images", file);
-        });
-      } 
-      
-      else {
-        formData.append(key, value);
-      }
-    });
+    if (key === "data") return;
+    if (key === "contact") {
+      Object.entries(value).forEach(([k, v]) =>
+        formData.append(`contact.${k}`, v)
+      );
+    } else if (key === "images") {
+      household.images.forEach((file) => {
+        formData.append("images", file);
+      });
+    } else {
+      formData.append(key, value);
+    }
+  });
 
-  // Contact sahəsi JSON kimi
-  // formData.append("contact", JSON.stringify(contact));
-formData.append("data", household.data.toISOString());
+  formData.append("data", household.data.toISOString());
 
   try {
+    const token = localStorage.getItem("token"); // tokeni oxu
+    const config = {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${token}`, // token əlavə et
+      },
+    };
+
     if (editingId) {
       await axios.put(
         `http://localhost:5000/api/Household/${editingId}`,
         formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
+        config
       );
       setEditingId(null);
     } else {
       await axios.post(
         "http://localhost:5000/api/Household",
         formData,
-        { headers: { "Content-Type": "multipart/form-data" } }
+        config
       );
       Swal.fire({
         icon: "success",
@@ -134,6 +132,7 @@ formData.append("data", household.data.toISOString());
     });
   }
 };
+
 
 
   const resetForm = () => {

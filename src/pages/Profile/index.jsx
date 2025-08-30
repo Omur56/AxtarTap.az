@@ -204,27 +204,192 @@
 // }
 
 
+
+// import React, { useEffect, useState } from "react";
+// import axios from "axios";
+// import { useNavigate } from "react-router-dom";
+// import { Button, Typography, Card, CardContent, CardMedia, Grid, Box, Dialog, IconButton } from "@mui/material";
+// import { ArrowBackIos, ArrowForwardIos, Close } from "@mui/icons-material";
+
+// export default function Profile() {
+//   const [userData, setUserData] = useState(null);
+//   const [myAds, setMyAds] = useState([]); // bütün kateqoriyalar üçün
+//   const [zoomIndex, setZoomIndex] = useState(null);
+//   const [zoomCategory, setZoomCategory] = useState(null); // hansı kateqoriyada zoom
+//   const navigate = useNavigate();
+//   const token = localStorage.getItem("token");
+
+//   useEffect(() => {
+//     const userId = localStorage.getItem("userId");
+//     if (!token || !userId) return navigate("/login");
+
+//     const fetchUser = async () => {
+//       try {
+//         const res = await axios.get(`http://localhost:5000/api/users/${userId}`, {
+//           headers: { Authorization: `Bearer ${token}` }
+//         });
+//         setUserData(res.data);
+//       } catch (err) {
+//         console.error(err);
+//       }
+//     };
+
+//     const fetchMyAds = async () => {
+//       try {
+//         // Burada bütün kateqoriyaların API-larını çağırırıq
+//         const categories = [
+//           "cars", "realEstate", "homeAndGarden",
+//           "electronika", "phone", "clothing", "houseHold", "accessories"
+//         ];
+//         const promises = categories.map(cat =>
+//           axios.get(`http://localhost:5000/api/my-${cat}`, {
+//             headers: { Authorization: `Bearer ${token}` }
+//           }).then(res => res.data.map(ad => ({ ...ad, category: cat })))
+//             .catch(() => [])
+//         );
+//         const results = await Promise.all(promises);
+//         const allAds = results.flat(); // hamısını bir arraydə birləşdiririk
+//         setMyAds(allAds.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
+//       } catch (err) {
+//         console.error(err);
+//       }
+//     };
+
+//     fetchUser();
+//     fetchMyAds();
+//   }, [navigate, token]);
+
+//   const handleLogout = () => {
+//     localStorage.removeItem("token");
+//     localStorage.removeItem("userId");
+//     navigate("/login");
+//   };
+
+//   const handleDelete = async (id, category) => {
+//     if (!window.confirm("Həqiqətən silmək istəyirsiniz?")) return;
+//     try {
+//       await axios.delete(`http://localhost:5000/api/${category}/${id}`, {
+//         headers: { Authorization: `Bearer ${token}` }
+//       });
+//       setMyAds(prev => prev.filter(ad => ad._id !== id));
+//     } catch (err) {
+//       console.error("Delete error:", err.response?.data || err.message);
+//     }
+//   };
+
+//   const openZoom = (index) => setZoomIndex(index);
+//   const closeZoom = () => {
+//     setZoomIndex(null);
+//     setZoomCategory(null);
+//   };
+
+//   const prevImage = () => setZoomIndex(prev => (prev === 0 ? myAds.length - 1 : prev - 1));
+//   const nextImage = () => setZoomIndex(prev => (prev === myAds.length - 1 ? 0 : prev + 1));
+
+//   if (!userData) return <Typography variant="h6" align="center">Loading...</Typography>;
+
+//   return (
+//     <Box p={3} sx={{ minHeight: "100vh", backgroundColor: "#f5f5f5" }}>
+//       <Box maxWidth={900} mx="auto" bgcolor="white" p={3} borderRadius={3} boxShadow={3}>
+//         <Typography variant="h4" align="center" gutterBottom>Profil Məlumatları</Typography>
+//         <Typography><strong>İstifadəçi adı:</strong> {userData.username}</Typography>
+//         <Typography><strong>Email:</strong> {userData.email}</Typography>
+//         <Typography><strong>Mobil:</strong> {userData.phone} {userData.phoneVerified && "✅ Təsdiqlənib"}</Typography>
+
+//         <Button variant="contained" color="error" sx={{ mt: 2 }} onClick={handleLogout}>Logout</Button>
+
+//         <Typography variant="h5" mt={4} mb={2}>Sizin Elanlarınız</Typography>
+//         {myAds.length === 0 ? (
+//           <Typography>Heç bir elanınız yoxdur.</Typography>
+//         ) : (
+//           <Grid container spacing={2}>
+//             {myAds.map((ad, index) => (
+//               <Grid item xs={12} sm={6} md={4} key={ad._id}>
+//                 <Card sx={{ cursor: "pointer" }}>
+//                   <CardMedia
+//                     component="img"
+//                     height="180"
+//                     image={ad.images?.[0]?.startsWith("http") ? ad.images[0] : "/no-image.jpg"}
+//                     alt={ad.title || ad.brand}
+//                     onClick={() => { setZoomIndex(index); setZoomCategory(ad.category); }}
+//                   />
+//                   <CardContent>
+//                     <Typography variant="subtitle2" noWrap>{ad.title || `${ad.brand || ""} ${ad.model || ""}`}</Typography>
+//                     <Typography variant="caption" color="text.secondary" sx={{ display: "block", lineHeight: 1.2 }}>
+//                       <strong>Kateqoriya:</strong> {ad.category}<br/>
+//                       {ad.brand && <><strong>Marka:</strong> {ad.brand}<br/></>}
+//                       {ad.model && <><strong>Model:</strong> {ad.model}<br/></>}
+//                       {ad.year && <><strong>İl:</strong> {ad.year}<br/></>}
+//                       {ad.price && <><strong>Qiymət:</strong> {ad.price} AZN<br/></>}
+//                       {ad.location && <><strong>Şəhər/Rayon:</strong> {ad.location}<br/></>}
+//                     </Typography>
+//                     <Box mt={1} display="flex" gap={1}>
+//                       <Button size="small" variant="outlined" color="warning" onClick={() => handleDelete(ad._id, ad.category)}>Delete</Button>
+//                     </Box>
+//                   </CardContent>
+//                 </Card>
+//               </Grid>
+//             ))}
+//           </Grid>
+//         )}
+//       </Box>
+
+//       {/* Zoom Dialog */}
+//       {zoomIndex !== null && (
+//         <Dialog open={true} onClose={closeZoom} maxWidth="lg">
+//           <Box position="relative" bgcolor="black">
+//             <IconButton onClick={closeZoom} sx={{ position: "absolute", top: 10, right: 10, color: "white", zIndex: 10 }}>
+//               <Close fontSize="large" />
+//             </IconButton>
+//             <IconButton onClick={prevImage} sx={{ position: "absolute", top: "50%", left: 10, color: "white", zIndex: 10 }}>
+//               <ArrowBackIos fontSize="large" />
+//             </IconButton>
+//             <img
+//               src={myAds[zoomIndex].images?.[0]?.startsWith("http") ? myAds[zoomIndex].images[0] : "/no-image.jpg"}
+//               alt="Zoomed"
+//               style={{ width: "100%", height: "80vh", objectFit: "contain" }}
+//             />
+//             <IconButton onClick={nextImage} sx={{ position: "absolute", top: "50%", right: 10, color: "white", zIndex: 10 }}>
+//               <ArrowForwardIos fontSize="large" />
+//             </IconButton>
+//           </Box>
+//         </Dialog>
+//       )}
+//     </Box>
+//   );
+// }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { Button, Typography, Card, CardContent, CardMedia, Grid, Box, Dialog, IconButton } from "@mui/material";
+import { ArrowBackIos, ArrowForwardIos, Close } from "@mui/icons-material";
 
 export default function Profile() {
   const [userData, setUserData] = useState(null);
-  const [myAnnouncements, setMyAnnouncements] = useState([]);
-  const [otpSent, setOtpSent] = useState(false);
-  const [otp, setOtp] = useState("");
-  const [verifying, setVerifying] = useState(false);
-
+  const [myAds, setMyAds] = useState([]);
+  const [zoomIndex, setZoomIndex] = useState(null);
+  const [zoomCategory, setZoomCategory] = useState(null);
   const navigate = useNavigate();
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
     const userId = localStorage.getItem("userId");
-
-    if (!token || !userId) {
-      navigate("/login");
-      return;
-    }
+    if (!token || !userId) return navigate("/login");
 
     const fetchUser = async () => {
       try {
@@ -233,26 +398,24 @@ export default function Profile() {
         });
         setUserData(res.data);
       } catch (err) {
-        console.error("User fetch error:", err);
+        console.error(err);
       }
     };
 
-    const fetchMyAnnouncements = async () => {
+    const fetchMyAds = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/announcements/my-announcements", {
+        const res = await axios.get("http://localhost:5000/api/homGarden/my-announcements", {
           headers: { Authorization: `Bearer ${token}` }
         });
-        setMyAnnouncements(res.data);
+        setMyAds(res.data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)));
       } catch (err) {
-        console.error("Announcements fetch error:", err);
+        console.error(err);
       }
     };
 
     fetchUser();
-    fetchMyAnnouncements();
-  }, [navigate]);
-
-  const token = localStorage.getItem("token");
+    fetchMyAds();
+  }, [navigate, token]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -260,143 +423,96 @@ export default function Profile() {
     navigate("/login");
   };
 
-  const sendOtp = async () => {
-    if (!userData.phone) return alert("Telefon nömrəsi yoxdur!");
-    try {
-      await axios.post("http://localhost:5000/api/send-otp", { phone: userData.phone });
-      setOtpSent(true);
-      alert("OTP göndərildi!");
-    } catch (err) {
-      console.error(err);
-      alert("OTP göndərilə bilmədi");
-    }
-  };
-
-  const verifyOtp = async () => {
-    if (!otp) return alert("OTP daxil edin!");
-    setVerifying(true);
-    try {
-      await axios.post("http://localhost:5000/api/verify-otp", {
-        phone: userData.phone,
-        otp
-      });
-      alert("Telefon təsdiqləndi!");
-      setOtpSent(false);
-      setOtp("");
-      setUserData({ ...userData, phoneVerified: true });
-    } catch (err) {
-      console.error(err);
-      alert(err.response?.data?.message || "Xəta baş verdi");
-    } finally {
-      setVerifying(false);
-    }
-  };
-
   const handleDelete = async (id) => {
     if (!window.confirm("Həqiqətən silmək istəyirsiniz?")) return;
     try {
-      await axios.delete(`http://localhost:5000/api/announcements/${id}`, {
+      await axios.delete(`http://localhost:5000/api/homGarden/${id}`, {
         headers: { Authorization: `Bearer ${token}` }
       });
-      setMyAnnouncements(prev => prev.filter(a => a._id !== id));
+      setMyAds(prev => prev.filter(ad => ad._id !== id));
     } catch (err) {
-      console.error(err);
+      console.error("Delete error:", err.response?.data || err.message);
     }
   };
 
-  const handleEdit = async (id) => {
-    const newTitle = prompt("Yeni başlıq daxil edin:");
-    const newDescription = prompt("Yeni təsvir daxil edin:");
-    if (!newTitle || !newDescription) return;
-    try {
-      const res = await axios.put(
-        `http://localhost:5000/api/announcements/${id}`,
-        { title: newTitle, description: newDescription },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setMyAnnouncements(prev => prev.map(a => (a._id === id ? res.data : a)));
-    } catch (err) {
-      console.error(err);
-    }
+  const openZoom = (index) => setZoomIndex(index);
+  const closeZoom = () => {
+    setZoomIndex(null);
+    setZoomCategory(null);
   };
 
-  if (!userData) return <div>Loading...</div>;
+  const prevImage = () => setZoomIndex(prev => (prev === 0 ? myAds.length - 1 : prev - 1));
+  const nextImage = () => setZoomIndex(prev => (prev === myAds.length - 1 ? 0 : prev + 1));
+
+  if (!userData) return <Typography variant="h6" align="center">Loading...</Typography>;
 
   return (
-    <div className="p-5 min-h-screen bg-gray-50">
-      <div className="max-w-3xl mx-auto bg-white shadow-lg rounded-xl p-6">
-        <h1 className="text-3xl font-bold mb-4 text-center">Profil Məlumatları</h1>
-        <p><strong>İstifadəçi adı:</strong> {userData.username}</p>
-        <p className="flex items-center gap-2">
-          <strong>Mobil:</strong> {userData.phone} 
-          {userData.phoneVerified ? (
-            <span className="text-green-600 font-semibold ml-2">Təsdiqlənib ✅</span>
-          ) : (
-            <button
-              onClick={sendOtp}
-              className="ml-2 bg-blue-500 text-white px-2 py-1 rounded hover:bg-blue-600 transition"
-            >
-              OTP Göndər
-            </button>
-          )}
-        </p>
+    <Box p={3} sx={{ minHeight: "100vh", backgroundColor: "#f5f5f5" }}>
+      <Box maxWidth={900} mx="auto" bgcolor="white" p={3} borderRadius={3} boxShadow={3}>
+        <Typography variant="h4" align="center" gutterBottom>Profil Məlumatları</Typography>
+        <Typography><strong>İstifadəçi adı:</strong> {userData.username}</Typography>
+        <Typography><strong>Email:</strong> {userData.email}</Typography>
+        <Typography><strong>Mobil:</strong> {userData.phone} {userData.phoneVerified && "✅ Təsdiqlənib"}</Typography>
 
-        {otpSent && !userData.phoneVerified && (
-          <div className="mt-3 flex gap-2">
-            <input
-              type="text"
-              placeholder="OTP daxil edin"
-              value={otp}
-              onChange={(e) => setOtp(e.target.value)}
-              className="border px-3 py-2 rounded w-32"
-            />
-            <button
-              onClick={verifyOtp}
-              disabled={verifying}
-              className="bg-green-500 text-white px-3 py-2 rounded hover:bg-green-600 transition"
-            >
-              {verifying ? "Yoxlanır..." : "Təsdiqlə"}
-            </button>
-          </div>
-        )}
+        <Button variant="contained" color="error" sx={{ mt: 2 }} onClick={handleLogout}>Logout</Button>
 
-        <p><strong>Email:</strong> {userData.email}</p>
-
-        <button
-          onClick={handleLogout}
-          className="mt-4 bg-red-500 px-4 py-2 rounded text-white hover:bg-red-600 transition"
-        >
-          Logout
-        </button>
-
-        <h2 className="text-2xl font-semibold mt-8 mb-4">Sizin Elanlarınız</h2>
-        {myAnnouncements.length === 0 ? (
-          <p>Heç bir elanınız yoxdur.</p>
+        <Typography variant="h5" mt={4} mb={2}>Sizin Elanlarınız</Typography>
+        {myAds.length === 0 ? (
+          <Typography>Heç bir elanınız yoxdur.</Typography>
         ) : (
-          <ul className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {myAnnouncements.map(ann => (
-              <li key={ann._id} className="border p-4 rounded shadow hover:shadow-lg transition bg-gray-50">
-                <h3 className="text-lg font-bold mb-1">{ann.title}</h3>
-                <p className="mb-2">{ann.description}</p>
-                <div className="flex gap-2">
-                  <button 
-                    onClick={() => handleEdit(ann._id)} 
-                    className="bg-yellow-400 px-2 py-1 rounded text-white hover:bg-yellow-500 transition"
-                  >
-                    Edit
-                  </button>
-                  <button 
-                    onClick={() => handleDelete(ann._id)} 
-                    className="bg-red-500 px-2 py-1 rounded text-white hover:bg-red-600 transition"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </li>
+          <Grid container spacing={2}>
+            {myAds.map((ad, index) => (
+              <Grid item xs={12} sm={6} md={4} key={ad._id}>
+                <Card sx={{ cursor: "pointer" }}>
+                  <CardMedia
+                    component="img"
+                    height="180"
+                    image={ad.images?.[0]?.startsWith("http") ? ad.images[0] : "/no-image.jpg"}
+                    alt={ad.title || ad.brand}
+                    onClick={() => { setZoomIndex(index); setZoomCategory(ad.category); }}
+                  />
+                  <CardContent>
+                    <Typography variant="subtitle2" noWrap>{ad.title || `${ad.brand || ""} ${ad.model || ""}`}</Typography>
+                    <Typography variant="caption" color="text.secondary" sx={{ display: "block", lineHeight: 1.2 }}>
+                      <strong>Kateqoriya:</strong> {ad.category}<br/>
+                      {ad.brand && <><strong>Marka:</strong> {ad.brand}<br/></>}
+                      {ad.model && <><strong>Model:</strong> {ad.model}<br/></>}
+                      {ad.year && <><strong>İl:</strong> {ad.year}<br/></>}
+                      {ad.price && <><strong>Qiymət:</strong> {ad.price} AZN<br/></>}
+                      {ad.location && <><strong>Şəhər/Rayon:</strong> {ad.location}<br/></>}
+                    </Typography>
+                    <Box mt={1} display="flex" gap={1}>
+                      <Button size="small" variant="outlined" color="warning" onClick={() => handleDelete(ad._id)}>Delete</Button>
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
             ))}
-          </ul>
+          </Grid>
         )}
-      </div>
-    </div>
+      </Box>
+
+      {zoomIndex !== null && (
+        <Dialog open={true} onClose={closeZoom} maxWidth="lg">
+          <Box position="relative" bgcolor="black">
+            <IconButton onClick={closeZoom} sx={{ position: "absolute", top: 10, right: 10, color: "white", zIndex: 10 }}>
+              <Close fontSize="large" />
+            </IconButton>
+            <IconButton onClick={prevImage} sx={{ position: "absolute", top: "50%", left: 10, color: "white", zIndex: 10 }}>
+              <ArrowBackIos fontSize="large" />
+            </IconButton>
+            <img
+              src={myAds[zoomIndex].images?.[0]?.startsWith("http") ? myAds[zoomIndex].images[0] : "/no-image.jpg"}
+              alt="Zoomed"
+              style={{ width: "100%", height: "80vh", objectFit: "contain" }}
+            />
+            <IconButton onClick={nextImage} sx={{ position: "absolute", top: "50%", right: 10, color: "white", zIndex: 10 }}>
+              <ArrowForwardIos fontSize="large" />
+            </IconButton>
+          </Box>
+        </Dialog>
+      )}
+    </Box>
   );
 }
+

@@ -3,10 +3,7 @@
 import mongoose from "mongoose";
 
 const RealEstateSchema = new mongoose.Schema({
-  id: {
-    type: Number,
-    unique: true,
-  },
+  
   title_type: String,
   type_building: String,
   field: String,
@@ -16,6 +13,8 @@ const RealEstateSchema = new mongoose.Schema({
   price: String,
   data: Date,
   description: String,
+   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+   data: { type: Date, default: Date.now },
   contact: {
     name: String,
     email: String,

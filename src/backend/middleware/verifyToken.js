@@ -36,17 +36,32 @@
 import jwt from "jsonwebtoken";
 
 export const verifyToken = (req, res, next) => {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) return res.status(401).json("Access Denied");
+ 
 
-  const token = authHeader.split(" ")[1];
-  if (!token) return res.status(401).json("Access Denied");
 
-  try {
-    const verified = jwt.verify(token, "SECRET_KEY");
-    req.userId = verified.id;
+    const authHeader = req.headers["authorization"];
+  const token = authHeader && authHeader.split(" ")[1];
+  if (!token) return res.status(401).json({ message: "Token yoxdur" });
+
+  jwt.verify(token, "SECRET_KEY", (err, user) => {
+    if (err) return res.status(403).json({ message: "Token etibarsızdır" });
+    req.user = user;
     next();
-  } catch (err) {
-    res.status(401).json("Invalid Token");
-  }
+  });
 };
+
+
+ // const authHeader = req.headers.authorization;
+  // if (!authHeader) return res.status(401).json("Access Denied");
+
+  // const token = authHeader.split(" ")[1];
+  // if (!token) return res.status(401).json("Access Denied");
+
+  // try {
+  //   const verified = jwt.verify(token, "SECRET_KEY");
+  //   req.userId = verified.id;
+  //   next();
+  // } catch (err) {
+  //   res.status(401).json("Invalid Token");
+  // }
+

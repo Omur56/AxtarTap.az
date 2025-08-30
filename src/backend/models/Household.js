@@ -61,10 +61,7 @@
 import mongoose from "mongoose";
 
 const HouseHoldSchema = new mongoose.Schema({
-  id: {
-    type: Number,
-    unique: true,
-  },
+  
   category: String,
   title: String,
   description: String,
@@ -72,6 +69,8 @@ const HouseHoldSchema = new mongoose.Schema({
   location: String,
   price: String,
   images: [String],  
+   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+ data: { type: Date, default: Date.now },
   contact: {
     name: String,
     email: String,

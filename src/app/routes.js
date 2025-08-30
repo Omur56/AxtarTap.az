@@ -35,6 +35,8 @@ import Reqister from "../pages/Reqister";
 import Profile from "../pages/Profile";
 import Admin from "../pages/AdminPanel";
 import AdsPanel from "../pages/AdsPanel";
+import AdminLogin from "../pages/AdminLogin";
+import MyHomeAndGarden from "../backend/models/HomeAndGarden";
 const router = createBrowserRouter([
   <RootLayout />,
   {
@@ -180,10 +182,18 @@ const router = createBrowserRouter([
         path: "/search",
         Component: Search,
       },
-
+{
+        path: "/my-homeAndGarden ",
+        Component: MyHomeAndGarden,
+      },
       {
         path: "/AdminPanel",
         Component: Admin,
+      },
+
+      {
+        path: "/admin/login",
+         Component: AdminLogin,
       },
 
       {
@@ -207,6 +217,7 @@ const router = createBrowserRouter([
         path: "/Profile",
         Component: Profile,
       },
+      
     ],
   },
 ]);

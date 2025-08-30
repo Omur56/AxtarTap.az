@@ -27,6 +27,13 @@ import statsRouter from "./routes/stats.js";
 import announcementRoutes from "./routes/announcements.js";
 import bodyParser from "body-parser";
 import twilio from "twilio";
+import authMiddleware from "./middleware/authMiddleware.js";
+import profileRoutes from "./routes/Profile.js";
+// token yoxlayan middleware
+
+
+
+
 // import otpRoutes from "./routes/otp.js";
 
 
@@ -82,9 +89,65 @@ app.use("/api", authRoutes);
 app.use("/api/ads", adsRouter);
 app.use("/api/stats", statsRouter);
 app.use("/api/announcements", announcementRoutes);
-app.use("/uploads", express.static("uploads")); 
+app.use("/uploads", express.static("uploads"));
+app.use("/api", profileRoutes);
 // app.use(bodyParser.json());
 // app.use("/api", otpRoutes);
+
+
+
+
+
+
+// kateqoriya-mapping
+const modelsMap = {
+
+  realEstate: RealEstate,
+  homeAndGarden: HomeAndGarden,
+  Clothing: Clothing,
+  Announcement: Announcement,
+  Electronika: Electronika,
+  
+  Phone: Phone,
+
+};
+
+// GET /api/my-{category} - istifadəçinin bütün elanları
+app.get("/my-:category", authMiddleware, async (req, res) => {
+  try {
+    const category = req.params.category;
+    const Model = modelsMap[category];
+    if (!Model) return res.status(400).json({ message: "Invalid category" });
+
+    const ads = await Model.find({ user: req.user.id }).sort({ createdAt: -1 });
+    res.json(ads);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// DELETE /api/{category}/{id} - istifadəçi öz elanını silir
+app.delete("/:category/:id", authMiddleware, async (req, res) => {
+  try {
+    const { category, id } = req.params;
+    const Model = modelsMap[category];
+    if (!Model) return res.status(400).json({ message: "Invalid category" });
+
+    const ad = await Model.findById(id);
+    if (!ad) return res.status(404).json({ message: "Ad not found" });
+
+    // Yalnız sahibi silə bilər
+    if (ad.user.toString() !== req.user.id)
+      return res.status(403).json({ message: "Not authorized" });
+
+    await Model.findByIdAndDelete(id);
+    res.json({ message: "Ad deleted" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
+});
 async function idGenerator() {
   let unique = false;
   let newId;
@@ -96,6 +159,46 @@ async function idGenerator() {
   }
   return newId;
 }
+
+
+
+
+const ADMIN_USER = {
+  username: "Omrs",
+  password: "omrs5566", // test üçün sadə saxlanılıb
+};
+
+// Login route
+app.post("/api/admin/login", (req, res) => {
+  const { username, password } = req.body;
+
+  if (username === ADMIN_USER.username && password === ADMIN_USER.password) {
+    const token = jwt.sign({ role: "admin" }, "secretKey", { expiresIn: "1h" });
+    return res.json({ token });
+  } else {
+    return res.status(401).json({ message: "İstifadəçi adı və ya şifrə yalnışdır" });
+  }
+});
+
+// Middleware – token yoxlamaq üçün
+function verifyAdmin(req, res, next) {
+  const authHeader = req.headers.authorization;
+  if (!authHeader) return res.status(403).json({ message: "Token yoxdur" });
+
+  const token = authHeader.split(" ")[1];
+  jwt.verify(token, "secretKey", (err, decoded) => {
+    if (err) return res.status(403).json({ message: "Token etibarsızdır" });
+    if (decoded.role !== "admin") return res.status(403).json({ message: "Admin girişi tələb olunur" });
+    next();
+  });
+}
+
+// Məsələn reklamlar üçün qorunan route
+app.get("/api/ads", verifyAdmin, (req, res) => {
+  res.json([
+    { id: 1, title: "Test Ad", link: "http://example.com" },
+  ]);
+});
 
 
 
@@ -145,339 +248,509 @@ app.post("/api/verify-otp", (req, res) => {
 
 
 
-
-app.get("/api/cars/:id", async (req, res) => {
-  try {
-    const car = await Announcement.findOne({ id: Number(req.params.id) });
-    if (!car) return res.status(404).json({ message: "Elan tapılmadı" });
-    res.json(car); // 200 status ilə qaytarır
-  } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Server xətası" });
-  }
-});
-
-// Bütün elanları gətir
-app.get("/api/cars", async (req, res) => {
-
-  try {
-    const cars = await Announcement.find().sort({ data: -1 });
-    res.json(cars);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+// app.get("/api/my-cars", verifyToken, async (req, res) => {
+//   try {
+//     const cars = await Announcement.find({ userId: req.user.id }).sort({ data: -1 });
+//     res.json(cars);
+//   } catch (err) {
+//     res.status(500).json({ error: err.message });
+//   }
+// });
 
 
 
+// app.get("/api/cars/:id", async (req, res) => {
+//   try {
+//     const car = await Announcement.findOne({ id: Number(req.params.id) });
+//     if (!car) return res.status(404).json({ message: "Elan tapılmadı" });
+//     res.json(car); // 200 status ilə qaytarır
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ message: "Server xətası" });
+//   }
+// });
+
+// // Bütün elanları gətir
+// app.get("/api/cars", async (req, res) => {
+
+//   try {
+//     const cars = await Announcement.find().sort({ data: -1 });
+//     res.json(cars);
+//   } catch (err) {
+//     res.status(500).json({ error: err.message });
+//   }
+// });
 
 
-app.post("/api/cars", upload.array("images", 20 ), async (req, res) => {
-  const newId = await idGenerator();
-  try {
-     const { id } = req.params;
+// app.post("/api/cars", upload.array("images", 20 ), async (req, res) => {
+//   const newId = await idGenerator();
+//   try {
+//      const { id } = req.params;
       
-    const {
+//     const {
      
-    category,
-    ban_type,
-    brand,
-    model,
-    year,
-    price,
-    location,
-    images,
-    km,
-    motor,
-    transmission,
-    liked,
-    favorite,
-    engine,
-    data,
+//     category,
+//     ban_type,
+//     brand,
+//     model,
+//     year,
+//     price,
+//     location,
+//     images,
+//     km,
+//     motor,
+//     transmission,
+//     liked,
+//     favorite,
+//     engine,
+//     data,
     
-    description, } = req.body;
+//     description, } = req.body;
     
-    const contact = {
-      name: req.body["contact.name"],
-      email: req.body["contact.email"],
-      phone: req.body["contact.phone"],
-  }
- const imageUrls = req.files.map(file => `http://localhost:${PORT}/uploads/${file.filename}`);
+//     const contact = {
+//       name: req.body["contact.name"],
+//       email: req.body["contact.email"],
+//       phone: req.body["contact.phone"],
+//   }
+//  const imageUrls = req.files.map(file => `http://localhost:${PORT}/uploads/${file.filename}`);
 
-  const newAnn = new Announcement({
-      id: newId,
-      ban_type,
-      category,
-      brand,
-      model,
-      year,
-      price,
-      location,
-      images,
-      km,
-      motor,
-      transmission,
-      engine,
-      contact,
-      liked: liked === "true",
-      favorite: favorite === "true",
-      data : data ? new Date(data) : new Date(),
-      description,
+//   const newAnn = new Announcement({
+//       id: newId,
+//       ban_type,
+//       category,
+//       brand,
+//       model,
+//       year,
+//       price,
+//       location,
+//       images,
+//       km,
+//       motor,
+//       transmission,
+//       engine,
+//       contact,
+//       liked: liked === "true",
+//       favorite: favorite === "true",
+//       data : data ? new Date(data) : new Date(),
+//       description,
+//        userId: req.user.id,
      
-   images: imageUrls,
-      // image: req.file ? `http://localhost:${PORT}/uploads/${req.file.filename}` : "",
-})
+//    images: imageUrls,
+//       // image: req.file ? `http://localhost:${PORT}/uploads/${req.file.filename}` : "",
+// })
 
-await newAnn.save();
-res.status(201).json(newAnn);
-} catch (err) {
-  res.status(500).json({error: err.message});
-}
-});
-
-
-
-// Multer upload və verifyToken middleware əvvəlcədən əlavə olunub
+// await newAnn.save();
+// res.status(201).json(newAnn);
+// } catch (err) {
+//   res.status(500).json({error: err.message});
+// }
+// });
 
 
-app.put("/api/cars/:id", upload.array("images", 20), async (req, res) => {
-   try {
-    const { id } = req.params;
-    const {
-         category,
-         ban_type,
-    brand,
-    model,
-    year,
-    price,
-    location,
-    images,
-    km,
-    motor,
-    transmission,
-    liked,
-    favorite,
-    engine,
-    data,
-    description,
+
+// // Multer upload və verifyToken middleware əvvəlcədən əlavə olunub
+
+
+// app.put("/api/cars/:id",verifyToken, upload.array("images", 20), async (req, res) => {
+//    try {
+//     const ann = await Announcement.findById(req.params.id);
+//     if (!ann) return res.status(404).json({ message: "Elan tapılmadı" });
+
+//     // İstifadəçi sahib deyil -> icazə yoxdur
+//     if (ann.userId !== req.user.id) {
+//       return res.status(403).json({ message: "Bu elanı yeniləmək hüququn yoxdur" });
+//     }
+
+//     // əgər sahibdirsə yeniləməyə davam et...
+//     Object.assign(ann, req.body);
+//     await ann.save();
+//     res.json(ann);
+//     const { id } = req.params;
+//     const {
+//          category,
+//          ban_type,
+//     brand,
+//     model,
+//     year,
+//     price,
+//     location,
+//     images,
+//     km,
+//     motor,
+//     transmission,
+//     liked,
+//     favorite,
+//     engine,
+//     data,
+//     description,
 
     
-    } = req.body;
-    const contact = {
-      name: req.body.name,
-      email: req.body.email,
-      phone: req.body.phone,
-    };
- let imageUrls = [];
+//     } = req.body;
+//     const contact = {
+//       name: req.body.name,
+//       email: req.body.email,
+//       phone: req.body.phone,
+//     };
+//  let imageUrls = [];
 
-    if (req.files && req.files.length > 0) {
-      imageUrls = req.files.map(file => `http://localhost:${PORT}/uploads/${file.filename}`);
-    }
+//     if (req.files && req.files.length > 0) {
+//       imageUrls = req.files.map(file => `http://localhost:${PORT}/uploads/${file.filename}`);
+//     }
 
-    const updatedFields = {
-      id:  Date.now(), 
-        category,
-      model,
-      ban_type,
-      year,
-      brand,
-      price,
-      location,
-      images,
-      km,
-      motor,
-      transmission,
-      description,
-      engine,
-      contact,
-      liked: liked === "true",
-      favorite: favorite === "true",
-      data: data ? new Date(data) : new Date(),
-         images: req.files
-    ? req.files.map(file => `http://localhost:${PORT}/uploads/${file.filename}`)
-    : [],
-    };
+//     const updatedFields = {
+//       id:  Date.now(), 
+//         category,
+//       model,
+//       ban_type,
+//       year,
+//       brand,
+//       price,
+//       location,
+//       images,
+//       km,
+//       motor,
+//       transmission,
+//       description,
+//       engine,
+//       contact,
+//       liked: liked === "true",
+//       favorite: favorite === "true",
+//       data: data ? new Date(data) : new Date(),
+//          images: req.files
+//     ? req.files.map(file => `http://localhost:${PORT}/uploads/${file.filename}`)
+//     : [],
+//     };
 
 
 
 
 
   
-     if (imageUrls.length > 0) {
-      updatedFields.images = imageUrls; // şəkilləri yenilə
-    }
+//      if (imageUrls.length > 0) {
+//       updatedFields.images = imageUrls; // şəkilləri yenilə
+//     }
 
     
 
-    if (req.file) {
-      updatedFields.images = `http://localhost:${PORT}/uploads/${req.files.filename}`;
-    }
-    const update = await Announcement.findByIdAndUpdate(id, updatedFields, { new: true});
-    res.json(update);
-  } catch (err) {
-    res.status(500).json({ error: err.message})
-  }
-});
+//     if (req.file) {
+//       updatedFields.images = `http://localhost:${PORT}/uploads/${req.files.filename}`;
+//     }
+//     const update = await Announcement.findByIdAndUpdate(id, updatedFields, { new: true});
+//     res.json(update);
+//   } catch (err) {
+//     res.status(500).json({ error: err.message})
+//   }
+// });
 
 
-app.delete("/api/cars/:id", async (req, res) => {
+// app.delete("/api/cars/:id", verifyToken, async (req, res) => {
+//   try {
+
+//     const ann = await Announcement.findById(req.params.id);
+//     if (!ann) return res.status(404).json({ message: "Elan tapılmadı" });
+
+//     if (ann.userId !== req.user.id) {
+//       return res.status(403).json({ message: "Bu elanı silmək hüququn yoxdur" });
+//     }
+
+//     await ann.deleteOne();
+//     res.status(204).send();
+
+//     const { id } = req.params;
+//   await Announcement.findByIdAndDelete(req.params.id);
+//     res.status(204).send();
+//   } catch  (err){
+//     res.status(500).json({ error: err.message})
+//   }
+// });
+
+
+
+// app.patch("/api/cars/:id/like", async (req, res) => {
+//   try {
+//       const car = await Announcement.findById(req.params.id);
+//       car.liked = !car.liked;
+//       await car.save();
+//       res.json(car);
+//   } catch (err) {
+//     res.status(500).json({ error: err.message})
+//   }
+// });
+
+
+// app.patch("/api/cars/:id/favorite", async (req, res) => {
+//   try {
+//     const car = await Announcement.findById(req.params.id); 
+//     car.favorite = !car.favorite;
+//     await car.save();
+//     res.json(car);
+//   }catch (err) {
+//     res.status(500).json({error: err.message})
+//   }
+// });
+
+// app.get("/api/my-cars", verifyToken, async (req, res) => {
+//   try {
+//     const cars = await Announcement.find({ userId: req.user.id }).sort({ data: -1 });
+//     res.json(cars);
+//   } catch (err) {
+//     res.status(500).json({ error: err.message });
+//   }
+// });
+
+
+// Bütün elanları gətir
+app.get("/api/cars", async (req, res) => {
   try {
+    const cars = await Announcement.find().sort({ createdAt: -1 });
+    res.json(cars);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
 
-    const { id } = req.params;
-  await Announcement.findByIdAndDelete(req.params.id);
-    res.status(204).send();
-  } catch  (err){
-    res.status(500).json({ error: err.message})
+// Yalnız öz elanlarını gətir
+app.get("/api/my-cars", verifyToken, async (req, res) => {
+  try {
+    const cars = await Announcement.find({ userId: req.user.id }).sort({ createdAt: -1 });
+    res.json(cars);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ID ilə elan
+app.get("/api/cars/:id", async (req, res) => {
+  try {
+    const car = await Announcement.findById(req.params.id);
+    if (!car) return res.status(404).json({ message: "Elan tapılmadı" });
+    res.json(car);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server xətası" });
+  }
+});
+
+// Yeni elan əlavə et
+app.post("/api/cars", verifyToken, upload.array("images", 20), async (req, res) => {
+  try {
+    const newId = await idGenerator();
+
+    const newAnn = new Announcement({
+      ...req.body,
+      id: newId,
+      userId: req.user.id,
+      images: req.files.map(file => `http://localhost:${PORT}/uploads/${file.filename}`),
+      liked: false,
+      favorite: false,
+    });
+
+    await newAnn.save();
+    res.status(201).json(newAnn);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Elanı yenilə
+app.put("/api/cars/:id", verifyToken, upload.array("images", 20), async (req, res) => {
+  try {
+    const ann = await Announcement.findById(req.params.id);
+    if (!ann) return res.status(404).json({ message: "Elan tapılmadı" });
+
+    if (ann.userId !== req.user.id) {
+      return res.status(403).json({ message: "Bu elanı yeniləmək hüququn yoxdur" });
+    }
+
+    if (req.files && req.files.length > 0) {
+      ann.images = req.files.map(file => `http://localhost:${PORT}/uploads/${file.filename}`);
+    }
+
+    const { title, description, price } = req.body;
+    if (title) ann.title = title;
+    if (description) ann.description = description;
+    if (price) ann.price = price;
+
+    await ann.save();
+    res.json(ann);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Elanı sil
+app.delete("/api/cars/:id", verifyToken, async (req, res) => {
+  try {
+    const ann = await Announcement.findById(req.params.id);
+
+    if (!ann) {
+      return res.status(404).json({ message: "Elan tapılmadı" });
+    }
+
+    if (ann.userId.toString() !== req.user.id.toString()) {
+      return res.status(403).json({ message: "Bu elanı silmək hüququn yoxdur" });
+    }
+
+    await ann.deleteOne();
+    res.json({ message: "Elan uğurla silindi ✅" });
+  } catch (err) {
+    console.error("Delete error:", err);
+    res.status(500).json({ error: "Server xətası" });
   }
 });
 
 
-
+// Like / Favorite toggle
 app.patch("/api/cars/:id/like", async (req, res) => {
   try {
-      const car = await Announcement.findById(req.params.id);
-      car.liked = !car.liked;
-      await car.save();
-      res.json(car);
+    const car = await Announcement.findById(req.params.id);
+    if (!car) return res.status(404).json({ message: "Elan tapılmadı" });
+    car.liked = !car.liked;
+    await car.save();
+    res.json(car);
   } catch (err) {
-    res.status(500).json({ error: err.message})
+    console.error(err);
+    res.status(500).json({ error: err.message });
   }
 });
-
 
 app.patch("/api/cars/:id/favorite", async (req, res) => {
   try {
-    const car = await Announcement.findById(req.params.id); 
+    const car = await Announcement.findById(req.params.id);
+    if (!car) return res.status(404).json({ message: "Elan tapılmadı" });
     car.favorite = !car.favorite;
     await car.save();
     res.json(car);
-  }catch (err) {
-    res.status(500).json({error: err.message})
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: err.message });
   }
 });
 
 
 
-
-
-
-
-app.post("/api/homGarden", upload.array("images", 20), async (req, res) => {
-    const newId = await idGenerator();
+app.delete("/api/:category/:id", verifyToken, async (req, res) => {
   try {
-     const { id } = req.params;
-    const {
-      model,
-      category,
-      title,
-      description,
-      brand,
-      price,
-      location,
-      liked,
-      favorite,
-      data,
-      images,
-    } = req.body;
+    const { category, id } = req.params;
+    const ad = await Announcement.findOne({ _id: id, category });
+    if (!ad) return res.status(404).json({ message: "Elan tapılmadı" });
+
+    if (ad.userId !== req.user.id) {
+      return res.status(403).json({ message: "Bu elanı silmək hüququn yoxdur" });
+    }
+
+    await ad.deleteOne();
+    res.status(204).send();
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+// ----------------- HomeAndGarden -----------------
+
+
+
+// POST /api/homGarden - yeni elan
+// app.post("/api/homGarden", verifyToken, upload.array("images", 20), async (req, res) => {
+//   try {
+//     const {
+//       model,
+//       category,
+//       title,
+//       description,
+//       brand,
+//       price,
+//       location,
+//       liked,
+//       favorite,
+//       data
+//     } = req.body;
+
+//     const contact = {
+//       name: req.body["contact.name"],
+//       email: req.body["contact.email"],
+//       phone: req.body["contact.phone"],
+//     };
+
+//     const imageUrls = req.files?.map(f => `http://localhost:5000/uploads/${f.filename}`) || [];
+
+//     const newHome = new HomeAndGarden({
+//       userId: req.user.id,
+//       model,
+//       category,
+//       title,
+//       description,
+//       brand,
+//       price,
+//       location,
+//       contact,
+//       liked: liked === "true",
+//       favorite: favorite === "true",
+//       data: data ? new Date(data) : new Date(),
+//       images: imageUrls
+//     });
+
+//     await newHome.save();
+//     res.status(201).json(newHome);
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: err.message });
+//   }
+// });
+
+
+
+app.post("/api/homGarden", verifyToken, upload.array("images", 20), async (req, res) => {
+  try {
+    const { model, category, title, description, brand, price, location, liked, favorite, data } = req.body;
     const contact = {
       name: req.body["contact.name"],
       email: req.body["contact.email"],
       phone: req.body["contact.phone"],
     };
-  const imageUrls = req.files.map(file => `http://localhost:${PORT}/uploads/${file.filename}`);
-    
+    const imageUrls = req.files?.map(f => `http://localhost:5000/uploads/${f.filename}`) || [];
+
     const newHome = new HomeAndGarden({
-      id: newId,
-      model,
-      category,
-      title,
-      description,
-      brand,
-      price,
-      location,
-      contact,
-      liked: liked === "true",
-      favorite: favorite === "true",
+      userId: req.user.id,
+      model, category, title, description, brand, price, location,
+      contact, liked: liked === "true", favorite: favorite === "true",
       data: data ? new Date(data) : new Date(),
-       images: imageUrls,
+      images: imageUrls,
     });
 
     await newHome.save();
     res.status(201).json(newHome);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 });
 
-// ✏️ Elan yenilə (PUT)
-app.put("/api/homGarden/:id", upload.array("images", 20), async (req, res) => {
+
+app.get("/api/homGarden/my-announcements", verifyToken, async (req, res) => {
+  const items = await Announcement.find({ userId: req.user.id });
+  res.json(items);
+});
+
+app.get("/api/homGarden/my-announcements", verifyToken, async (req, res) => {
+  const items = await Announcement.find({ userId: req.user.id });
+  res.json(items);
+});
+
+app.get("/api/homGarden/my", verifyToken, async (req, res) => {
   try {
-    const { id } = req.params;
-    const {
-      model,
-      category,
-      title,
-      description,
-      brand,
-      price,
-      location,
-      liked,
-      favorite,
-      data,
-    } = req.body;
-    const contact = {
-      name: req.body["contact.name"],
-      email: req.body["contact.email"],
-      phone: req.body["contact.phone"],
-
-
-    };
-
-     let imageUrls = [];
-
-    if (req.files && req.files.length > 0) {
-      imageUrls = req.files.map(file => `http://localhost:${PORT}/uploads/${file.filename}`);
-    }
-
-    const updatedFields = {
-      id: Date.now(),
-      model,
-      category,
-      title,
-      description,
-      brand,
-      price,
-      location,
-      contact,
-      liked: liked === "true",
-      favorite: favorite === "true",
-      data: data ? new Date(data) : new Date(),
-      images: req.files
-  ? req.files.map(file => `http://localhost:${PORT}/uploads/${file.filename}`)
-  : [],
-    };
-     if (imageUrls.length > 0) {
-      updatedFields.images = imageUrls; // şəkilləri yenilə
-    }
-
-    
-
-    if (req.file) {
-      updatedFields.images = `http://localhost:${PORT}/uploads/${req.files.filename}`;
-    }
-
-    const updated = await HomeAndGarden.findByIdAndUpdate(id, updatedFields, {
-      new: true,
-    });
-    res.json(updated);
+    const items = await HomeAndGarden.find({ userId: req.user.id }).sort({ data: -1 });
+    res.json(items);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
-
+// GET bütün elanlar
 app.get("/api/homGarden", async (req, res) => {
   try {
-     const { id } = req.params;
     const items = await HomeAndGarden.find().sort({ data: -1 });
     res.json(items);
   } catch (err) {
@@ -485,30 +758,74 @@ app.get("/api/homGarden", async (req, res) => {
   }
 });
 
+// GET tək elan
 app.get("/api/homGarden/:id", async (req, res) => {
   try {
-     const { id } = req.params;
     const item = await HomeAndGarden.findById(req.params.id);
+    if (!item) return res.status(404).json({ message: "Elan tapılmadı" });
     res.json(item);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-app.delete("/api/homGarden/:id", async (req, res) => {
+// GET istifadəçinin öz elanları
+app.get("/api/homGarden/my", verifyToken, async (req, res) => {
   try {
-     const { id } = req.params;
-    await HomeAndGarden.findByIdAndDelete(req.params.id);
+    const items = await HomeAndGarden.find({ userId: req.user.id }).sort({ data: -1 });
+    res.json(items);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// PUT - elan yenilə
+app.put("/api/homGarden/:id", verifyToken, upload.array("images", 20), async (req, res) => {
+  try {
+    const item = await HomeAndGarden.findById(req.params.id);
+    if (!item) return res.status(404).json({ message: "Elan tapılmadı" });
+    if (item.userId.toString() !== req.user.id) return res.status(403).json({ message: "İcazəniz yoxdur" });
+
+    const { model, category, title, description, brand, price, location, liked, favorite, data } = req.body;
+    const contact = {
+      name: req.body["contact.name"],
+      email: req.body["contact.email"],
+      phone: req.body["contact.phone"]
+    };
+    const imageUrls = req.files?.map(f => `http://localhost:5000/uploads/${f.filename}`) || item.images;
+
+    Object.assign(item, {
+      model, category, title, description, brand, price, location,
+      contact, liked: liked === "true", favorite: favorite === "true",
+      data: data ? new Date(data) : item.data,
+      images: imageUrls
+    });
+
+    await item.save();
+    res.json(item);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE - elan sil
+app.delete("/api/homGarden/:id", verifyToken, async (req, res) => {
+  try {
+    const item = await HomeAndGarden.findById(req.params.id);
+    if (!item) return res.status(404).json({ message: "Elan tapılmadı" });
+    if (item.userId.toString() !== req.user.id) return res.status(403).json({ message: "İcazəniz yoxdur" });
+    await item.deleteOne();
     res.status(204).send();
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
 });
 
-app.patch("/api/homGarden/:id/like", async (req, res) => {
+// PATCH like
+app.patch("/api/homGarden/:id/like", verifyToken, async (req, res) => {
   try {
-     const { id } = req.params;
     const item = await HomeAndGarden.findById(req.params.id);
+    if (!item) return res.status(404).json({ message: "Elan tapılmadı" });
     item.liked = !item.liked;
     await item.save();
     res.json(item);
@@ -517,10 +834,11 @@ app.patch("/api/homGarden/:id/like", async (req, res) => {
   }
 });
 
-app.patch("/api/homGarden/:id/favorite", async (req, res) => {
+// PATCH favorite
+app.patch("/api/homGarden/:id/favorite", verifyToken, async (req, res) => {
   try {
-     const { id } = req.params;
     const item = await HomeAndGarden.findById(req.params.id);
+    if (!item) return res.status(404).json({ message: "Elan tapılmadı" });
     item.favorite = !item.favorite;
     await item.save();
     res.json(item);
@@ -529,7 +847,9 @@ app.patch("/api/homGarden/:id/favorite", async (req, res) => {
   }
 });
 
-// Bütün elanları götür
+
+// ----------------- Electronika -----------------
+// GET bütün elanlar
 app.get("/api/electronika", async (req, res) => {
   try {
     const items = await Electronika.find();
@@ -539,24 +859,45 @@ app.get("/api/electronika", async (req, res) => {
   }
 });
 
-// Yeni elan əlavə et
-// `images` field-lə çoxlu fayl qəbul edir
-app.post("/api/electronika", upload.array("images", 10), async (req, res) => {
-    const newId = await idGenerator();
+// GET mənim elanlarım
+app.get("/api/my-electronika", verifyToken, async (req, res) => {
   try {
-    // Yüklənmiş şəkillərin server URL-lərini qur
+    const items = await Electronika.find({ userId: req.user.id }).sort({ data: -1 });
+    res.json(items);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// DELETE elan (sahibinə görə)
+app.delete("/api/electronika/:id", verifyToken, async (req, res) => {
+  try {
+    const item = await Electronika.findById(req.params.id);
+    if (!item) return res.status(404).json({ message: "Elan tapılmadı" });
+    if (item.userId.toString() !== req.user.id)
+      return res.status(403).json({ message: "Bu elanı silmək hüququn yoxdur" });
+    await item.deleteOne();
+    res.status(204).send();
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// Yeni elan əlavə et
+app.post("/api/electronika", verifyToken, upload.array("images", 10), async (req, res) => {
+  try {
+    const newId = await idGenerator();
+
     const imageUrls = req.files.map(
       (file) => `http://localhost:${PORT}/uploads/${file.filename}`
     );
 
-    // Contact datanı formdan gələn contact.*-dən qur
     const contact = {
       name: req.body["contact.name"] || "",
       email: req.body["contact.email"] || "",
       phone: req.body["contact.phone"] || "",
     };
 
-    // Yeni elan
     const newPost = new Electronika({
       id: newId,
       category: req.body.category,
@@ -571,6 +912,7 @@ app.post("/api/electronika", upload.array("images", 10), async (req, res) => {
       liked: false,
       favorite: false,
       data: req.body.data ? new Date(req.body.data) : Date.now(),
+      userId: req.user.id, // vacib
     });
 
     await newPost.save();
@@ -580,56 +922,40 @@ app.post("/api/electronika", upload.array("images", 10), async (req, res) => {
   }
 });
 
-
-app.put(
-  "/api/electronika/:id",
-  upload.array("images", 10),
-  async (req, res) => {
-    try {
-      const post = await Electronika.findById(req.params.id);
-      if (!post) return res.status(404).json({ message: "Post tapılmadı" });
-
-   
-      if (req.files.length > 0) {
-        const imageUrls = req.files.map(
-          (file) => `http://localhost:${PORT}/uploads/${file.filename}`
-        );
-        post.images = imageUrls;
-      }
-
-      post.title = req.body.title || post.title;
-      post.brand = req.body.brand || post.brand;
-      post.model = req.body.model || post.model;
-      post.price = req.body.price || post.price;
-      post.location = req.body.location || post.location;
-      post.description = req.body.description || post.description;
-
-      post.contact = {
-        name: req.body["contact.name"] || post.contact.name,
-        email: req.body["contact.email"] || post.contact.email,
-        phone: req.body["contact.phone"] || post.contact.phone,
-      };
-
-      post.data = req.body.data ? new Date(req.body.data) : post.data;
-
-      await post.save();
-      res.json(post);
-    } catch (error) {
-      res.status(400).json({ message: error.message });
-    }
-  }
-);
-
-app.delete("/api/electronika/:id", async (req, res) => {
+// UPDATE elan
+app.put("/api/electronika/:id", verifyToken, upload.array("images", 10), async (req, res) => {
   try {
     const post = await Electronika.findById(req.params.id);
     if (!post) return res.status(404).json({ message: "Post tapılmadı" });
+    if (post.userId.toString() !== req.user.id)
+      return res.status(403).json({ message: "Bu elanı dəyişmək hüququn yoxdur" });
 
- 
-    await post.remove();
-    res.json({ message: "Post silindi" });
+    if (req.files.length > 0) {
+      const imageUrls = req.files.map(
+        (file) => `http://localhost:${PORT}/uploads/${file.filename}`
+      );
+      post.images = imageUrls;
+    }
+
+    post.title = req.body.title || post.title;
+    post.brand = req.body.brand || post.brand;
+    post.model = req.body.model || post.model;
+    post.price = req.body.price || post.price;
+    post.location = req.body.location || post.location;
+    post.description = req.body.description || post.description;
+
+    post.contact = {
+      name: req.body["contact.name"] || post.contact.name,
+      email: req.body["contact.email"] || post.contact.email,
+      phone: req.body["contact.phone"] || post.contact.phone,
+    };
+
+    post.data = req.body.data ? new Date(req.body.data) : post.data;
+
+    await post.save();
+    res.json(post);
   } catch (error) {
-    res.status(500).json({ message: error.message });
+    res.status(400).json({ message: error.message });
   }
 });
 
@@ -661,6 +987,7 @@ app.patch("/api/electronika/:id/favorite", async (req, res) => {
   }
 });
 
+// GET tək elan
 app.get("/api/electronika/:id", async (req, res) => {
   try {
     const item = await Electronika.findById(req.params.id);
@@ -672,6 +999,32 @@ app.get("/api/electronika/:id", async (req, res) => {
 });
 
 
+
+
+
+
+// ----------------- Accessory -----------------
+app.get("/api/my-accessories", verifyToken, async (req, res) => {
+  try {
+    const items = await Accessory.find({ userId: req.user.id }).sort({ data: -1 });
+    res.json(items);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete("/api/accessories/:id", verifyToken, async (req, res) => {
+  try {
+    const item = await Accessory.findById(req.params.id);
+    if (!item) return res.status(404).json({ message: "Elan tapılmadı" });
+    if (item.userId !== req.user.id)
+      return res.status(403).json({ message: "Bu elanı silmək hüququn yoxdur" });
+    await item.deleteOne();
+    res.status(204).send();
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 app.get("/api/accessories", async (req, res) => {
   try {
     const accessories = await Accessory.find();
@@ -692,29 +1045,29 @@ app.get("/api/accessories/:id", async (req, res) => {
 });
 
 
-app.post("/api/accessories", upload.array("images", 10), async (req, res) => {
-    const newId = await idGenerator();
+app.post("/api/accessories", verifyToken, upload.array("images", 10), async (req, res) => {
   try {
     const images = req.files.map(
-      (file) => `${req.protocol}://${req.get("host")}/uploads/${file.filename}`
+      file => `${req.protocol}://${req.get("host")}/uploads/${file.filename}`
     );
+
     const accessory = new Accessory({
-      id: newId,
       ...req.body,
       images,
+      userId: req.user.id, // <- burda istifadəçinin ID-si
       contact: {
         name: req.body["contact.name"],
         email: req.body["contact.email"],
         phone: req.body["contact.phone"],
       },
     });
+
     await accessory.save();
     res.status(201).json(accessory);
   } catch (err) {
     res.status(400).json({ error: err.message });
   }
 });
-
 
 app.put(
   "/api/accessories/:id",
@@ -805,7 +1158,28 @@ app.delete("/api/accessories/images/:imageName", async (req, res) => {
 
 
 
+// ----------------- RealEstate -----------------
+app.get("/api/my-realEstate", verifyToken, async (req, res) => {
+  try {
+    const items = await RealEstate.find({ userId: req.user.id }).sort({ data: -1 });
+    res.json(items);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
+app.delete("/api/RealEstate/:id", verifyToken, async (req, res) => {
+  try {
+    const item = await RealEstate.findById(req.params.id);
+    if (!item) return res.status(404).json({ message: "Elan tapılmadı" });
+    if (item.userId !== req.user.id)
+      return res.status(403).json({ message: "Bu elanı silmək hüququn yoxdur" });
+    await item.deleteOne();
+    res.status(204).send();
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // Like toggle
 app.patch("/api/RealEstate/:id/like", async (req, res) => {
@@ -859,22 +1233,26 @@ app.get("/api/RealEstate", async (req, res) => {
 
 
 
-app.post("/api/RealEstate", upload.array("images", 20), async (req, res) => {
-    const newId = await idGenerator();
+app.post("/api/RealEstate", verifyToken, upload.array("images", 20), async (req, res) => {
   try {
+    const newId = await idGenerator();
+
     const images = req.files.map(
       (file) => `${req.protocol}://${req.get("host")}/uploads/${file.filename}`
     );
+
     const realEstatePost = new RealEstate({
       id: newId,
       ...req.body,
       images,
+      userId: req.user.id, // burada token-dan gələn userId əlavə olunur
       contact: {
         name: req.body["contact.name"],
         email: req.body["contact.email"],
         phone: req.body["contact.phone"],
       },
     });
+
     await realEstatePost.save();
     res.status(201).json(realEstatePost);
   } catch (err) {
@@ -964,6 +1342,30 @@ app.delete("/api/RealEstatePost/images/:imageName", async (req, res) => {
 
 
 
+// ----------------- HouseHold -----------------
+
+
+app.get("/api/my-household", verifyToken, async (req, res) => {
+  try {
+    const items = await HouseHold.find({ userId: req.user.id }).sort({ data: -1 });
+    res.json(items);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete("/api/Household/:id", verifyToken, async (req, res) => {
+  try {
+    const item = await HouseHold.findById(req.params.id);
+    if (!item) return res.status(404).json({ message: "Elan tapılmadı" });
+    if (item.userId !== req.user.id)
+      return res.status(403).json({ message: "Bu elanı silmək hüququn yoxdur" });
+    await item.deleteOne();
+    res.status(204).send();
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 
 app.get("/api/Household", async (req, res) => {
@@ -987,13 +1389,12 @@ app.get("/api/Household/:id", async (req, res) => {
 });
 
 
-app.post("/api/Household", upload.array("images", 20), async (req, res) => {
-    const newId = await idGenerator();
+app.post("/api/Household", verifyToken, upload.array("images", 20), async (req, res) => {
+  const newId = await idGenerator();
   try {
     const images = req.files.map(
       (file) => `${req.protocol}://${req.get("host")}/uploads/${file.filename}`
     );
-
 
     const contact = {
       name: req.body["contact.name"] || "",
@@ -1005,12 +1406,9 @@ app.post("/api/Household", upload.array("images", 20), async (req, res) => {
       id: newId,
       ...req.body,
       images,
-      contact: {
-        name: req.body["contact.name"],
-        email: req.body["contact.email"],
-        phone: req.body["contact.phone"],
-      },
+      contact,
       data: req.body.data ? new Date(req.body.data) : new Date(),
+      userId: req.user.id, // Token-dan gələn istifadəçi ID
     });
 
     await newHouseHold.save();
@@ -1019,6 +1417,7 @@ app.post("/api/Household", upload.array("images", 20), async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
+
 
 
 app.put("/api/Household/:id", upload.array("images", 10), async (req, res) => {
@@ -1125,8 +1524,30 @@ app.delete("/api/Household/images/:imageName", async (req, res) => {
 
 
 
-
+// ----------------- Phone -----------------
 // -----------------------------------------
+app.get("/api/my-phone", verifyToken, async (req, res) => {
+  try {
+    const items = await Phone.find({ userId: req.user.id }).sort({ data: -1 });
+    res.json(items);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete("/api/Phone/:id", verifyToken, async (req, res) => {
+  try {
+    const item = await Phone.findById(req.params.id);
+    if (!item) return res.status(404).json({ message: "Elan tapılmadı" });
+    if (item.userId !== req.user.id)
+      return res.status(403).json({ message: "Bu elanı silmək hüququn yoxdur" });
+    await item.deleteOne();
+    res.status(204).send();
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 
 app.get("/api/Phone", async (req, res) => {
   try {
@@ -1149,37 +1570,35 @@ app.get("/api/Phone/:id", async (req, res) => {
 });
 
 
-
-app.post("/api/Phone", upload.array("images", 20), async (req, res) => {
+app.post("/api/Phone", verifyToken, upload.array("images", 20), async (req, res) => {
   try {
-
     const newId = await idGenerator();
 
     const images = req.files.map(
       (file) => `${req.protocol}://${req.get("host")}/uploads/${file.filename}`
     );
 
-    const contact = {
-      name: req.body["contact.name"] || "",
-      email: req.body["contact.email"] || "",
-      phone: req.body["contact.phone"] || "",
-    };
-
     const newPhone = new Phone({
       id: newId,
       ...req.body,
       images,
-      contact,
+      contact: {
+        name: req.body["contact.name"] || "",
+        email: req.body["contact.email"] || "",
+        phone: req.body["contact.phone"] || "",
+      },
+      userId: req.user.id, // verifyToken middleware bu məlumatı əlavə etməlidir
       data: req.body.data ? new Date(req.body.data) : new Date(),
     });
 
     await newPhone.save();
     res.status(201).json(newPhone);
   } catch (err) {
-    console.error("❌ Xəta:", err.message);
+    console.error(err);
     res.status(400).json({ error: err.message });
   }
 });
+
 // Elanı yenilə
 app.put("/api/Phone/:id", upload.array("images", 20), async (req, res) => {
   try {
@@ -1278,8 +1697,30 @@ app.delete("/api/Phone/images/:imageName", async (req, res) => {
 
 // ---------------------------------------
 
+// ----------------- Clothing -----------------
 
 
+app.get("/api/my-clothing", verifyToken, async (req, res) => {
+  try {
+    const items = await Clothing.find({ userId: req.user.id }).sort({ data: -1 });
+    res.json(items);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.delete("/api/Clothing/:id", verifyToken, async (req, res) => {
+  try {
+    const item = await Clothing.findById(req.params.id);
+    if (!item) return res.status(404).json({ message: "Elan tapılmadı" });
+    if (item.userId !== req.user.id)
+      return res.status(403).json({ message: "Bu elanı silmək hüququn yoxdur" });
+    await item.deleteOne();
+    res.status(204).send();
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 app.get("/api/Clothing", async (req, res) => {
   try {
@@ -1303,18 +1744,21 @@ app.get("/api/Clothing/:id", async (req, res) => {
 
 // Yeni elan əlavə et
 app.post("/api/Clothing", upload.array("images", 10), async (req, res) => {
-    const newId = await idGenerator();
+  const newId = await idGenerator();
   try {
     const images = req.files.map(
       (file) => `${req.protocol}://${req.get("host")}/uploads/${file.filename}`
     );
 
-    // contact sahəsini req.body-dən ayrıca götür
     const contact = {
       name: req.body["contact.name"] || "",
       email: req.body["contact.email"] || "",
       phone: req.body["contact.phone"] || "",
     };
+
+    if (!req.body.userId) {
+      return res.status(400).json({ error: "userId tələb olunur" });
+    }
 
     const newClothing = new Clothing({
       id: newId,
@@ -1330,6 +1774,7 @@ app.post("/api/Clothing", upload.array("images", 10), async (req, res) => {
     res.status(400).json({ error: err.message });
   }
 });
+
 
 // Elanı yenilə
 app.put("/api/Clothing/:id", upload.array("images", 10), async (req, res) => {

@@ -30,7 +30,7 @@ const Home = () => {
     axios
       .get("http://localhost:5000/api/homGarden")
       .then((res) => {
-        console.log("Gələn data:", res.data);
+      
         setHomeGarden(res.data);
       })
       .catch((err) => {
@@ -44,7 +44,7 @@ const Home = () => {
     axios
       .get("http://localhost:5000/api/electronika")
       .then((res) => {
-        console.log("Gələn data:", res.data);
+        
         setElektronikaPost(res.data);
       })
       .catch((err) => {
@@ -58,7 +58,7 @@ const Home = () => {
     axios
       .get("http://localhost:5000/api/accessories")
       .then((res) => {
-        console.log("Gələn data:", res.data);
+       
         setAccessories(res.data);
       })
       .catch((err) => {
@@ -72,7 +72,7 @@ const Home = () => {
     axios
       .get("http://localhost:5000/api/realEstate")
       .then((res) => {
-        console.log("Gələn data:", res.data);
+        
         setRealEstate(res.data);
       })
       .catch((err) => {
@@ -86,7 +86,7 @@ const Home = () => {
     axios
       .get("http://localhost:5000/api/Household")
       .then((res) => {
-        console.log("Gələn data:", res.data);
+      
         setHousehold(res.data);
       })
       .catch((err) => {
@@ -100,7 +100,7 @@ const Home = () => {
     axios
       .get("http://localhost:5000/api/Phone")
       .then((res) => {
-        console.log("Gələn data:", res.data);
+      
         setPhone(res.data);
       })
       .catch((err) => {
@@ -114,7 +114,7 @@ const Home = () => {
     axios
       .get("http://localhost:5000/api/Clothing")
       .then((res) => {
-        console.log("Gələn data:", res.data);
+      
         setClothing(res.data);
       })
       .catch((err) => {
@@ -403,7 +403,7 @@ const Home = () => {
                   target="_blank"
                   rel="noopener noreferrer"
                   key={car.id}
-                  to={`/cars/${car.id}`}
+                  to={`/cars/${car._id}`}
                 >
                   <div className="sm:w-[240.4px] max-w-[240.4px] h-[300px] bg-white rounded-2xl shadow-lg transform hover:-translate-y-2 hover:scale-105 transition-all duration-300">
                     <div className="w-full h-[178.5px] bg-gray-100 relative">
@@ -439,7 +439,7 @@ const Home = () => {
                   key={post._id}
                   to={`/elan/${post._id}`}
                 >
-                  <div className="sm:w-[240.4px] max-w-[240.4px] h-[300px] bg-white rounded-2xl shadow-lg transform hover:-translate-y-2 hover:scale-105 transition-all duration-300">
+                  <div key={post._id} className="sm:w-[240.4px] max-w-[240.4px] h-[300px] bg-white rounded-2xl shadow-lg transform hover:-translate-y-2 hover:scale-105 transition-all duration-300">
                     <img
                       src={
                         post.images && post.images.length > 0
@@ -475,7 +475,7 @@ const Home = () => {
                   key={item._id}
                   to={`/PostDetailElectronika/${item._id}`}
                 >
-                  <div className="sm:w-[240.4px] max-w-[240.4px] h-[300px]  bg-white rounded-2xl  shadow-lg transform hover:-translate-y-2 hover:scale-105 transition-all duration-300">
+                  <div key={item._id} className="sm:w-[240.4px] max-w-[240.4px] h-[300px]  bg-white rounded-2xl  shadow-lg transform hover:-translate-y-2 hover:scale-105 transition-all duration-300">
                     <img
                       src={
                         item.images?.[0]?.startsWith("http")
@@ -511,7 +511,7 @@ const Home = () => {
                   key={item._id}
                   to={`/PostDetailAcsesuar/${item._id}`}
                 >
-                  <div className="sm:w-[240.4px] max-w-[240.4px] h-[300px]  bg-white rounded-2xl  shadow-lg transform hover:-translate-y-2 hover:scale-105 transition-all duration-300">
+                  <div key={item._id} className="sm:w-[240.4px] max-w-[240.4px] h-[300px]  bg-white rounded-2xl  shadow-lg transform hover:-translate-y-2 hover:scale-105 transition-all duration-300">
                     <img
                       src={
                         item.images?.[0]?.startsWith("http")
@@ -547,7 +547,7 @@ const Home = () => {
                   key={item._id}
                   to={`/PostRealEstate/${item._id}`}
                 >
-                  <div className="sm:w-[240.4px] max-w-[240.4px] h-[300px]  bg-white rounded-2xl  shadow-lg transform hover:-translate-y-2 hover:scale-105 transition-all duration-300">
+                  <div key={item._id} className="sm:w-[240.4px] max-w-[240.4px] h-[300px]  bg-white rounded-2xl  shadow-lg transform hover:-translate-y-2 hover:scale-105 transition-all duration-300">
                     <img
                       src={
                         item.images?.[0]?.startsWith("http")
@@ -581,7 +581,7 @@ const Home = () => {
                   key={item._id}
                   to={`/PostDetailHousehold/${item._id}`}
                 >
-                  <div className="sm:w-[240.4px] max-w-[240.4px] h-[300px]  bg-white rounded-2xl  shadow-lg transform hover:-translate-y-2 hover:scale-105 transition-all duration-300">
+                  <div key={item._id} className="sm:w-[240.4px] max-w-[240.4px] h-[300px]  bg-white rounded-2xl  shadow-lg transform hover:-translate-y-2 hover:scale-105 transition-all duration-300">
                     <img
                       src={
                         item.images?.[0]?.startsWith("http")
@@ -615,7 +615,7 @@ const Home = () => {
                   key={item._id}
                   to={`/PostDetailPhone/${item._id}`}
                 >
-                  <div className="sm:w-[240.4px] max-w-[240.4px] h-[300px]  bg-white rounded-2xl  shadow-lg transform hover:-translate-y-2 hover:scale-105 transition-all duration-300">
+                  <div key={item._id} className="sm:w-[240.4px] max-w-[240.4px] h-[300px]  bg-white rounded-2xl  shadow-lg transform hover:-translate-y-2 hover:scale-105 transition-all duration-300">
                     <img
                       src={
                         item.images?.[0]?.startsWith("http")
@@ -649,7 +649,7 @@ const Home = () => {
                   key={item._id}
                   to={`/PostDetailClothing/${item._id}`}
                 >
-                  <div className="sm:w-[240.4px] max-w-[240.4px] h-[300px]  bg-white rounded-2xl  shadow-lg transform hover:-translate-y-2 hover:scale-105 transition-all duration-300">
+                  <div key={item._id} className="sm:w-[240.4px] max-w-[240.4px] h-[300px]  bg-white rounded-2xl  shadow-lg transform hover:-translate-y-2 hover:scale-105 transition-all duration-300">
                     <img
                       src={
                         item.images?.[0]?.startsWith("http")

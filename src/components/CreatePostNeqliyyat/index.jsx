@@ -27,6 +27,9 @@ export default function CreatePost() {
     km: "",
     motor: "",
     transmission: "",
+    
+ 
+    
     engine: "",
     contact: {
       name: "",
@@ -75,54 +78,64 @@ export default function CreatePost() {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
- 
+  const token = localStorage.getItem("token");
+  const userId = localStorage.getItem("userId");
+  if (!token || !userId) {
+    Swal.fire({
+      icon: "warning",
+      title: "Giriş tələb olunur",
+      text: "Elan paylaşmaq üçün hesabınıza daxil olun.",
+    });
+    return;
+  }
 
-     const formData = new FormData();
+  const formData = new FormData();
 
-    images.forEach((file) => formData.append("images", file));
+  form.images.forEach((file) => formData.append("images", file));
 
-    Object.entries(form).forEach(([key, value]) => {
-      if (key === "data") return;
-      if (key === "contact") {
-        Object.entries(value).forEach(([k, v]) =>
-          formData.append(`contact.${k}`, v)
-        );
-      } else if (key === "images") {
-        form.images.forEach((file) => {
-          formData.append("images", file);
-        });
-      } 
-      
-      else {
-        formData.append(key, value);
-      }
+  Object.entries(form).forEach(([key, value]) => {
+    if (key === "data") return;
+    if (key === "contact") {
+      Object.entries(value).forEach(([k, v]) =>
+        formData.append(`contact.${k}`, v)
+      );
+    } else if (key !== "images") {
+      formData.append(key, value);
+    }
+  });
+
+  formData.append("data", form.data ? form.data.toISOString() : new Date().toISOString());
+  formData.append("userId", userId);
+
+  try {
+    await axios.post("http://localhost:5000/api/cars", formData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "multipart/form-data",
+      },
     });
 
-    formData.append("data", form.data.toISOString());
+    resetForm();
+    fetchCars();
+    Swal.fire({
+      icon: "success",
+      title: "Elanınız uğurla yerləşdirildi!",
+      confirmButtonColor: "#3085d6",
+    });
+  } catch (err) {
+    console.error("Elan yüklənmədi:", err.response?.data || err.message);
+    Swal.fire({
+      icon: "error",
+      title: "Xəta baş verdi",
+      text: err.response?.data?.error || "Server xətası",
+      confirmButtonColor: "#d33",
+    });
+  }
+};
 
-    try {
-      await axios.post("http://localhost:5000/api/cars", formData);
-      resetForm();
-      fetchCars();
-      Swal.fire({
-        icon: "success",
-        title: "Elanınız uğurla yerləşdirildi!",
-        
-        confirmButtonColor: "#3085d6",
-      });
-    } catch (err) {
-      console.error("Elan yüklənmədi:", err.response?.data || err.message);
-      Swal.fire({
-        icon: "error",
-        title: "Xəta baş verdi",
-        text: err.response?.data?.message || "Server xətası",
-        confirmButtonColor: "#d33",
-      });
-    }
-  };
   const resetForm = () => {
     setForm({
       id: Date.now(),
@@ -137,6 +150,7 @@ export default function CreatePost() {
       km: "",
       motor: "",
       transmission: "",
+      
       engine: "",
       contact: {
         name: "",
@@ -591,7 +605,7 @@ const handleOpenForm = () => {
             <>
               {[...cars].map((car) => (
                 <Link  target="_blank"
-            rel="noopener noreferrer" key={car.id} to={`/cars/${car.id}`}>
+            rel="noopener noreferrer" key={car._id} to={`/cars/${car._id}`}>
                   <div className="  w-[226px] h-[284px]  flex flex-col shadow-xl cursor-pointer bg-white rounded-2xl sm:w-[226px] max-w-[226px] hover:shadow-xl hover:scale-5 transition duration-50">
                     <div className="flex gap-2 rounded-t-sm">
                       {car.images?.[0] && (

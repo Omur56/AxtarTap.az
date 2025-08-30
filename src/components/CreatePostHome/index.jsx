@@ -12,7 +12,7 @@ export default function CreatePostForHomeAndGarden() {
   const { id } = useParams();
   const [isOpen, setIsOpen] = useState(false);
   const [homGardenForm, setHomGardenForm] = useState({
-    id: Date.now(),
+   
     category: "",
     title: "",
     description: "",
@@ -66,71 +66,81 @@ export default function CreatePostForHomeAndGarden() {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const formData = new FormData();
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  const formData = new FormData();
 
-    Object.entries(homGardenForm).forEach(([key, value]) => {
-      if (key === "data") {
-        formData.append("data", value.toISOString());
-      } else if (key === "contact") {
-        Object.entries(value).forEach(([k, v]) =>
-          formData.append(`contact.${k}`, v)
-        );
-      } else {
-        formData.append(key, value);
-      }
-    });
+  Object.entries(homGardenForm).forEach(([key, value]) => {
+    if (key === "data") {
+      formData.append("data", value.toISOString());
+    } else if (key === "contact") {
+      Object.entries(value).forEach(([k, v]) =>
+        formData.append(`contact.${k}`, v)
+      );
+    } else {
+      formData.append(key, value);
+    }
+  });
 
-  
-    images.forEach((file) => formData.append("images", file));
+  images.forEach((file) => formData.append("images", file));
 
-    try {
-      if (editingId) {
-        await axios.put(
-          `http://localhost:5000/api/homGarden/${editingId}`,
-          formData
-        );
-        setEditingId(null);
-      } else {
-        await axios.post("http://localhost:5000/api/homGarden", formData);
-        Swal.fire({
-          icon: "success",
-          title: "Elanınız uğurla yerləşdirildi!",
-          confirmButtonColor: "#3085d6",
-        });
-      }
+  const token = localStorage.getItem("token"); // token-i burada alırıq
 
-      
-      setHomGardenForm({
-        id: Date.now(),
-        category: "",
-        title: "",
-        description: "",
-        brand: "",
-        price: "",
-        location: "",
-        contact: { name: "", email: "", phone: "" },
-        liked: false,
-        favorite: false,
-        data: new Date(),
+  try {
+    if (editingId) {
+      await axios.put(
+        `http://localhost:5000/api/homGarden/${editingId}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // token əlavə olunur
+            "Content-Type": "multipart/form-data",
+          },
+        }
+      );
+      setEditingId(null);
+    } else {
+      await axios.post("http://localhost:5000/api/homGarden", formData, {
+        headers: {
+          Authorization: `Bearer ${token}`, // token əlavə olunur
+          "Content-Type": "multipart/form-data",
+        },
       });
-
-        // Form-u bağla
-
-      setImages([]);
-      setPreview([]);
-      fetchItems();
-    } catch (err) {
-      console.error("Error:", err);
       Swal.fire({
-        icon: "error",
-        title: "Xəta baş verdi",
-        text: err.response?.data?.message || "Server xətası",
-        confirmButtonColor: "#d33",
+        icon: "success",
+        title: "Elanınız uğurla yerləşdirildi!",
+        confirmButtonColor: "#3085d6",
       });
     }
-  };
+
+    setHomGardenForm({
+      
+     category: "",
+  title: "",
+  description: "",
+  brand: "",
+  price: "",
+  location: "",
+  contact: { name: "", email: "", phone: "" },
+  liked: false,
+  favorite: false,
+  data: new Date(),
+    });
+
+    setImages([]);
+    setPreview([]);
+    fetchItems();
+  } catch (err) {
+    console.error("Error:", err);
+    Swal.fire({
+      icon: "error",
+      title: "Xəta baş verdi",
+      text: err.response?.data?.message || "Server xətası",
+      confirmButtonColor: "#d33",
+    });
+  }
+};
+
 
   // Sil
   const handleDelete = async (id) => {
@@ -572,7 +582,7 @@ const handleOpenForm = () => {
             ))
           ) : (
             <>
-              {homGardenItems.map((item) => (
+              {[...homGardenItems].reverse().map((item) => (
                 <Link target="_blank"
             rel="noopener noreferrer" key={item._id} to={`/PostDetailHome/${item._id}`}>
                   <div className="flex flex-col w-[226px] h-[304px]  shadow-md rounded-2xl bg-white hover:shadow-xl">
@@ -604,3 +614,8 @@ const handleOpenForm = () => {
     </div>
   );
 }
+
+
+
+
+

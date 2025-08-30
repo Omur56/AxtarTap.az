@@ -5,21 +5,22 @@ const accessorySchema = new mongoose.Schema({
     type: Number,
     unique: true,
   },
-  title: String,
-  brand: String,
-  model: String,
-  price: String,
-  location: String,
+  data: { type: Date, default: Date.now }, // yalnız bir dəfə
+  title: { type: String, required: true },
+  brand: { type: String, required: true },
+  model: { type: String, required: true },
+  price: { type: String, required: true },
+  location: { type: String, required: true },
   images: [String],
-  description: String,
+  description: { type: String, required: true },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   contact: {
-    name: String,
-    email: String,
-    phone: String,
+    name: { type: String, required: true },
+    email: { type: String, required: true },
+    phone: { type: String, required: true },
   },
   liked: { type: Boolean, default: false },
   favorite: { type: Boolean, default: false },
-  data: { type: Date, default: Date.now }
 });
 
 const Accessory = mongoose.model("Accessory", accessorySchema);

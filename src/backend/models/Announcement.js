@@ -1,14 +1,8 @@
-
-
-
 import mongoose from "mongoose";
 
 const announcementSchema = new mongoose.Schema(
   {
-    id: {
-      type: Number,
-      unique: true,
-    },
+    id: { type: Number, required: true },
     category: String,
     brand: String,
     model: String,
@@ -21,24 +15,16 @@ const announcementSchema = new mongoose.Schema(
     motor: String,
     transmission: String,
     engine: String,
-    data: Date,
     description: String,
- 
- 
+    data: { type: Date, default: Date.now },
+    userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     contact: {
       name: String,
       email: String,
-      phone: Number,
-      
+      phone: String,
     },
-    liked: {
-      type: Boolean,
-      default: false,
-    },
-    favorite: {
-      type: Boolean,
-      default: false,
-    },
+    liked: { type: Boolean, default: false },
+    favorite: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

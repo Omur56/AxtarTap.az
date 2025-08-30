@@ -71,53 +71,70 @@ export default function CreateClothing() {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  const formData = new FormData();
 
-    const formData = new FormData();
+  images.forEach((file) => formData.append("images", file));
 
-    images.forEach((file) => formData.append("images", file));
+  Object.entries(clothingPost).forEach(([key, value]) => {
+    if (key === "images" || key === "date") return;
+    if (key === "contact") {
+      Object.entries(value).forEach(([k, v]) =>
+        formData.append(`contact.${k}`, v)
+      );
+    } else {
+      formData.append(key, value);
+    }
+  });
 
-    Object.entries(clothingPost).forEach(([key, value]) => {
-      if (key === "images" || key === "data") return;
-      if (key === "contact") {
-        Object.entries(value).forEach(([k, v]) =>
-          formData.append(`contact.${k}`, v)
-        );
-      } else {
-        formData.append(key, value);
-      }
-    });
+  // date sahəsi undefined ola bilər, ona görə yoxla
+  formData.append(
+    "date",
+    clothingPost.date ? clothingPost.date.toISOString() : new Date().toISOString()
+  );
 
-    formData.append("data", clothingPost.data.toISOString());
+  // Token və userId əlavə et
+  const token = localStorage.getItem("token");
+  const userId = localStorage.getItem("userId");
+  formData.append("userId", userId);
 
-    try {
-      if (editingId) {
-        await axios.put(
-          `http://localhost:5000/api/Clothing/${editingId}`,
-          formData
-        );
-        setEditingId(null);
-      } else {
-        await axios.post("http://localhost:5000/api/Clothing/", formData);
-        Swal.fire({
-          icon: "success",
-          title: "Elanınız uğurla yerləşdirildi!",
-          confirmButtonColor: "#3085d6",
-        });
-      }
-      resetForm();
-      fetchItems();
-    } catch (err) {
-      console.error(err);
+  try {
+    const config = {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    if (editingId) {
+      await axios.put(
+        `http://localhost:5000/api/Clothing/${editingId}`,
+        formData,
+        config
+      );
+      setEditingId(null);
+    } else {
+      await axios.post("http://localhost:5000/api/Clothing/", formData, config);
       Swal.fire({
-        icon: "error",
-        title: "Xəta baş verdi",
-        text: err.response?.data?.message || "Server xətası",
-        confirmButtonColor: "#d33",
+        icon: "success",
+        title: "Elanınız uğurla yerləşdirildi!",
+        confirmButtonColor: "#3085d6",
       });
     }
-  };
+
+    resetForm();
+    fetchItems();
+  } catch (err) {
+    console.error(err);
+    Swal.fire({
+      icon: "error",
+      title: "Xəta baş verdi",
+      text: err.response?.data?.error || "Server xətası",
+      confirmButtonColor: "#d33",
+    });
+  }
+};
 
   const resetForm = () => {
     setClothingPost({

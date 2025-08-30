@@ -68,72 +68,89 @@ export default function CreatePhone() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    const formData = new FormData();
+  e.preventDefault();
+  const formData = new FormData();
 
-    Object.entries(phonePost).forEach(([key, value]) => {
-      if (key === "data") {
-        formData.append("data", value.toISOString());
-      } else if (key === "contact") {
-        Object.entries(value).forEach(([k, v]) =>
-          formData.append(`contact.${k}`, v)
-        );
-      } else {
-        formData.append(key, value);
-      }
-    });
+  // Əsas sahələr
+  Object.entries(phonePost).forEach(([key, value]) => {
+    if (key === "data") {
+      formData.append("data", value.toISOString());
+    } else if (key === "contact") {
+      Object.entries(value).forEach(([k, v]) =>
+        formData.append(`contact.${k}`, v)
+      );
+    } else {
+      formData.append(key, value);
+    }
+  });
 
-    images.forEach((file) => formData.append("images", file));
+  // Şəkillər
+  images.forEach((file) => formData.append("images", file));
 
-    try {
-      if (editingId) {
-        await axios.put(
-          `http://localhost:5000/api/phone/${editingId}`,
-          formData
-        );
-        setEditingId(null);
-      } else {
-        await axios.post("http://localhost:5000/api/Phone", formData);
+  const token = localStorage.getItem("token"); // token olmalıdır
 
-        Swal.fire({
-          icon: "success",
-          title: "Elanınız uğurla yerləşdirildi!",
-          confirmButtonColor: "#3085d6",
-        });
-      }
-
-      setPhonePost({
-        id: Date.now(),
-        title: "",
-        brand: "",
-        model: "",
-        price: "",
-        color: "",
-        storage: "",
-        rom: "",
-        sim_card: "",
-        location: "",
-        images: [],
-        description: "",
-        contact: { name: "", email: "", phone: "" },
-        liked: false,
-        favorite: false,
-        data: new Date(),
+  try {
+    if (editingId) {
+      await axios.put(
+        `http://localhost:5000/api/Phone/${editingId}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setEditingId(null);
+    } else {
+      await axios.post("http://localhost:5000/api/Phone", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
       });
-      setImages([]);
-      setPreview([]);
-      resetForm();
-      fetchItems();
-    } catch (err) {
-      console.error("Error:", err);
+
       Swal.fire({
-        icon: "error",
-        title: "Xəta baş verdi",
-        text: err.response?.data?.message || "Server xətası",
-        confirmButtonColor: "#d33",
+        icon: "success",
+        title: "Elanınız uğurla yerləşdirildi!",
+        confirmButtonColor: "#3085d6",
       });
     }
-  };
+
+    // Formu sıfırla
+    setPhonePost({
+      id: Date.now(),
+      title: "",
+      brand: "",
+      model: "",
+      price: "",
+      color: "",
+      storage: "",
+      rom: "",
+      sim_card: "",
+      location: "",
+      images: [],
+      description: "",
+      contact: { name: "", email: "", phone: "" },
+      liked: false,
+      favorite: false,
+      data: new Date(),
+    });
+    setImages([]);
+    setPreview([]);
+    resetForm();
+    fetchItems();
+  } catch (err) {
+    console.error("Error:", err);
+    Swal.fire({
+      icon: "error",
+      title: "Xəta baş verdi",
+      text: err.response?.data?.message || "Server xətası",
+      confirmButtonColor: "#d33",
+    });
+  }
+};
+
 
   const resetForm = () => {
     setPhonePost({

@@ -1,41 +1,45 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+
 export default function AdminPanel() {
   const [ads, setAds] = useState([]);
   const [newAd, setNewAd] = useState({ title: "", link: "", image: null });
   const [stats, setStats] = useState({ posts: 0, users: 0 });
+  const navigate = useNavigate();
 
+  const token = localStorage.getItem("adminToken");
 
-  
-  // Statistikaları yüklə
+  // əgər token yoxdursa -> login səhifəsinə yönləndir
+  useEffect(() => {
+    if (!token) {
+      navigate("/admin/login");
+    }
+  }, [token, navigate]);
+
+  // axios-a header əlavə et
+  const axiosInstance = axios.create({
+    baseURL: "http://localhost:5000/api",
+    headers: { Authorization: `Bearer ${token}` },
+  });
+
   useEffect(() => {
     async function fetchData() {
       try {
-        const statsRes = await axios.get("http://localhost:5000/api/stats");
-setStats(statsRes.data);
-        
+        const statsRes = await axiosInstance.get("/stats");
+        setStats(statsRes.data);
+
+        const adsRes = await axiosInstance.get("/ads");
+        setAds(adsRes.data);
       } catch (err) {
-        console.error(err);
+        console.error("Xəta:", err);
+        if (err.response?.status === 403) {
+          navigate("/admin/login");
+        }
       }
     }
     fetchData();
-  }, []);
-
-  // Reklamları yüklə
-  useEffect(() => {
-    async function fetchAds() {
-      try {
-        const res = await axios.get("http://localhost:5000/api/ads");
-        setAds(res.data);
-      } catch (err) {
-        console.error(err);
-      }
-    }
-    fetchAds();
-  }, []);
-
-
+  }, [navigate]);
 
   // Reklam əlavə et
   const handleAddAd = async (e) => {
@@ -56,20 +60,34 @@ setStats(statsRes.data);
     }
   };
 
- 
-
+  // Reklam sil
   const handleDeleteAd = async (id) => {
-  try {
-    await axios.delete(`http://localhost:5000/api/ads/${id}`);
-    setAds((prevAds) => prevAds.filter((ad) => ad._id !== id));
-  } catch (err) {
-    console.error("Reklam silərkən xəta:", err);
-  }
-};
+    try {
+      await axios.delete(`http://localhost:5000/api/ads/${id}`);
+      setAds((prevAds) => prevAds.filter((ad) => ad._id !== id));
+    } catch (err) {
+      console.error("Reklam silərkən xəta:", err);
+    }
+  };
+
+  // Çıxış funksiyası
+  const handleLogout = () => {
+    localStorage.removeItem("adminToken");
+    navigate("/admin/login");
+  };
 
   return (
-    <div className="p-6 max-w-[1000px] min-h-screen mx-auto -my-auto">
-      <h1 className="text-3xl font-bold mb-6">Admin Panel</h1>
+    <div className="p-6 max-w-[1000px] min-h-screen mx-auto">
+      {/* Header */}
+      <div className="flex justify-between items-center mb-6">
+        <h1 className="text-3xl font-bold">Admin Panel</h1>
+        <button
+          onClick={handleLogout}
+          className="bg-red-600 text-white px-4 py-2 rounded"
+        >
+          Çıxış
+        </button>
+      </div>
 
       {/* Statistikalar */}
       <div className="grid grid-cols-2 gap-6 mb-6">
@@ -128,23 +146,23 @@ setStats(statsRes.data);
                 className="w-full h-32 object-cover rounded mb-2"
               />
               <div className="flex justify-between">
-                <div className=" grid grid-col-1 sm:grid-col-2">
-              <h3 className="font-semibold">{ad.title}</h3>
-              <Link
-                href={ad.link}
-                target="_blank"
-                rel="noreferrer"
-                className="text-blue-500 text-sm truncate w-10 "
-              >
-                Link Click
-              </Link>
-              </div>
-              <button
-                onClick={() => handleDeleteAd(ad._id)}
-                className="bg-red-600 text-white px-3 py-1 mt-2 rounded text-sm"
-              >
-                Sil
-              </button>
+                <div className="grid grid-col-1 sm:grid-col-2">
+                  <h3 className="font-semibold">{ad.title}</h3>
+                  <Link
+                    href={ad.link}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-blue-500 text-sm truncate w-10 "
+                  >
+                    Link Click
+                  </Link>
+                </div>
+                <button
+                  onClick={() => handleDeleteAd(ad._id)}
+                  className="bg-red-600 text-white px-3 py-1 mt-2 rounded text-sm"
+                >
+                  Sil
+                </button>
               </div>
             </div>
           ))}

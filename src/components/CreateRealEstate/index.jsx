@@ -98,52 +98,84 @@ export default function CreateRealEstate() {
     setEditingId(null);
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const formData = new FormData();
+const handleSubmit = async (e) => {
+  e.preventDefault();
 
-    images.forEach((file) => formData.append("images", file));
-
-    Object.entries(realEstatePost).forEach(([key, value]) => {
-      if (key === "data") return;
-      if (key === "contact") {
-        Object.entries(value).forEach(([k, v]) =>
-          formData.append(`contact.${k}`, v)
-        );
-      } else {
-        formData.append(key, value);
-      }
+  if (!token) {
+    Swal.fire({
+      icon: "warning",
+      title: "Giriş tələb olunur",
+      text: "Elan paylaşmaq üçün hesabınıza daxil olun.",
+      confirmButtonColor: "#3085d6",
     });
+    return;
+  }
 
-    formData.append("data", realEstatePost.data.toISOString());
+  const formData = new FormData();
 
-    try {
-      if (editingId) {
-        await axios.put(
-          `http://localhost:5000/api/realEstate/${editingId}`,
-          formData
-        );
-        setEditingId(null);
-      } else {
-        await axios.post("http://localhost:5000/api/realEstate", formData);
-        Swal.fire({
-          icon: "success",
-          title: "Elanınız uğurla yerləşdirildi!",
-          confirmButtonColor: "#3085d6",
-        });
-      }
-      resetForm();
-      fetchItems();
-    } catch (err) {
-      console.error(err);
+  // Şəkilləri əlavə et
+  images.forEach((file) => formData.append("images", file));
+
+  // Digər sahələri əlavə et
+  Object.entries(realEstatePost).forEach(([key, value]) => {
+    if (key === "data") return;
+    if (key === "contact") {
+      Object.entries(value).forEach(([k, v]) =>
+        formData.append(`contact.${k}`, v)
+      );
+    } else {
+      formData.append(key, value);
+    }
+  });
+
+  // Tarixi ISO formatında əlavə et
+  formData.append("data", realEstatePost.data.toISOString());
+
+  try {
+    if (editingId) {
+      await axios.put(
+        `http://localhost:5000/api/realEstate/${editingId}`,
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      setEditingId(null);
+    } else {
+      await axios.post(
+        "http://localhost:5000/api/realEstate",
+        formData,
+        {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
       Swal.fire({
-        icon: "error",
-        title: "Xəta baş verdi",
-        text: err.response?.data?.message || "Server xətası",
-        confirmButtonColor: "#d33",
+        icon: "success",
+        title: "Elanınız uğurla yerləşdirildi!",
+        confirmButtonColor: "#3085d6",
       });
     }
-  };
+
+    resetForm();
+    fetchItems();
+  } catch (err) {
+    console.error(err);
+    Swal.fire({
+      icon: "error",
+      title: "Xəta baş verdi",
+      text: err.response?.data?.message || "Server xətası",
+      confirmButtonColor: "#d33",
+    });
+  }
+};
+
 
   const handleDelete = async (id) => {
     try {

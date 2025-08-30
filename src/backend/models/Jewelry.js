@@ -28,10 +28,7 @@
 import mongoose from "mongoose";
 
 const jewelrySchema = new mongoose.Schema({
-  id: {
-    type: Number,
-    unique: true,
-  },
+ 
   title: String,
   cateqory: String,
   type_of_goods: String,
@@ -39,6 +36,8 @@ const jewelrySchema = new mongoose.Schema({
   location: String,
   images: [String],
   description: String,
+   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
+   
   contact: {
     name: String,
     email: String,

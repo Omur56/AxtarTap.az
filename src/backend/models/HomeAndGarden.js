@@ -1,19 +1,15 @@
-
-// const mongoose = require("mongoose");
+// import mongoose from "mongoose";
 
 // const HomeAndGardenSchema = new mongoose.Schema({
-//  id: {
-//     type: Number,
-//     unique: true,
-//   },
 //   category: String,
 //   model: String,
 //   title: String,
 //   description: String,
 //   brand: String,
 //   price: String,
-//   images: [String], // Tam URL saxlayacağıq
+//   images: [String],
 //   location: String,
+//   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
 //   contact: {
 //     name: String,
 //     email: String,
@@ -33,41 +29,38 @@
 //   },
 // });
 
-// module.exports = mongoose.model("HomeAndGarden", HomeAndGardenSchema);
+// const HomeAndGarden = mongoose.model("HomeAndGarden", HomeAndGardenSchema);
+// export default HomeAndGarden;
+
 
 
 import mongoose from "mongoose";
+import { v4 as uuidv4 } from "uuid";
 
 const HomeAndGardenSchema = new mongoose.Schema({
   id: {
-    type: Number,
+    type: String,
     unique: true,
+    default: uuidv4,
   },
-  category: String,
+  data: { type: Date, default: Date.now },
   model: String,
+  category: String,
   title: String,
   description: String,
   brand: String,
   price: String,
-  images: [String], // Tam URL saxlayacağıq
+  images: [String],
   location: String,
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
   contact: {
     name: String,
     email: String,
     phone: String,
   },
-  liked: {
-    type: Boolean,
-    default: false,
-  },
-  favorite: {
-    type: Boolean,
-    default: false,
-  },
-  data: {
-    type: Date,
-    default: Date.now,
-  },
+  liked: { type: Boolean, default: false },
+  favorite: { type: Boolean, default: false },
+  
 });
 
 const HomeAndGarden = mongoose.model("HomeAndGarden", HomeAndGardenSchema);
