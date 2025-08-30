@@ -107,7 +107,8 @@ const modelsMap = {
   Clothing: Clothing,
   Announcement: Announcement,
   Electronika: Electronika,
-  
+  Accessory: Accessory,
+  HouseHold: HouseHold,
   Phone: Phone,
 
 };
@@ -730,14 +731,14 @@ app.post("/api/homGarden", verifyToken, upload.array("images", 20), async (req, 
 });
 
 
+// app.get("/api/homGarden/my-announcements", verifyToken, async (req, res) => {
+//   const items = await Announcement.find({ userId: req.user.id });
+//   res.json(items);
+// });
+
+
+
 app.get("/api/homGarden/my-announcements", verifyToken, async (req, res) => {
-  const items = await Announcement.find({ userId: req.user.id });
-  res.json(items);
-});
-
-
-
-app.get("/api/homGarden/my", verifyToken, async (req, res) => {
   try {
     const items = await HomeAndGarden.find({ userId: req.user.id }).sort({ data: -1 });
     res.json(items);
@@ -767,7 +768,7 @@ app.get("/api/homGarden/:id", async (req, res) => {
 });
 
 // GET istifadəçinin öz elanları
-app.get("/api/homGarden/my", verifyToken, async (req, res) => {
+app.get("/api/homGarden/:id", verifyToken, async (req, res) => {
   try {
     const items = await HomeAndGarden.find({ userId: req.user.id }).sort({ data: -1 });
     res.json(items);
@@ -777,7 +778,7 @@ app.get("/api/homGarden/my", verifyToken, async (req, res) => {
 });
 
 // İstifadəçinin elan silməsi
-app.delete("/api/homeGarden/:id", verifyToken, async (req, res) => {
+app.delete("/api/homGarden/:id", verifyToken, async (req, res) => {
   try {
     const item = await HomeAndGarden.findById(req.params.id);
 
@@ -925,7 +926,7 @@ app.delete("/api/electronika/:id", verifyToken, async (req, res) => {
 });
 
 // Yeni elan əlavə et
-app.post("/api/electronika", verifyToken, upload.array("images", 10), async (req, res) => {
+app.post("/api/electronika", verifyToken, upload.array("images", 20), async (req, res) => {
   try {
     const newId = await idGenerator();
 
@@ -964,7 +965,7 @@ app.post("/api/electronika", verifyToken, upload.array("images", 10), async (req
 });
 
 // UPDATE elan
-app.put("/api/electronika/:id", verifyToken, upload.array("images", 10), async (req, res) => {
+app.put("/api/electronika/:id", verifyToken, upload.array("images", 20), async (req, res) => {
   try {
     const post = await Electronika.findById(req.params.id);
     if (!post) return res.status(404).json({ message: "Post tapılmadı" });
@@ -1086,7 +1087,7 @@ app.get("/api/accessories/:id", async (req, res) => {
 });
 
 
-app.post("/api/accessories", verifyToken, upload.array("images", 10), async (req, res) => {
+app.post("/api/accessories", verifyToken, upload.array("images", 20), async (req, res) => {
   try {
     const images = req.files.map(
       file => `${req.protocol}://${req.get("host")}/uploads/${file.filename}`
@@ -2241,11 +2242,10 @@ app.get("/api/announcements/my-announcements", verifyToken, async (req, res) => 
   }
 });
 
-
 app.get("/api/my-announcements", verifyToken, async (req, res) => {
   try {
     const homeAds = await HomeAndGarden.find({ userId: req.user.id }).lean();
-    homeAds.forEach(ad => ad.modelName = "HomeAndGarden");
+    homeAds.forEach(ad => ad.modelName = "homGarden");
 
     const clothingAds = await Clothing.find({ userId: req.user.id }).lean();
     clothingAds.forEach(ad => ad.modelName = "Clothing");
@@ -2254,21 +2254,19 @@ app.get("/api/my-announcements", verifyToken, async (req, res) => {
     phoneAds.forEach(ad => ad.modelName = "Phone");
 
     const householdAds = await HouseHold.find({ userId: req.user.id }).lean();
-    householdAds.forEach(ad => ad.modelName = "HouseHold");
+    householdAds.forEach(ad => ad.modelName = "Household");
 
     const realEstateAds = await RealEstate.find({ userId: req.user.id }).lean();
     realEstateAds.forEach(ad => ad.modelName = "RealEstate");
 
     const accessoryAds = await Accessory.find({ userId: req.user.id }).lean();
-    accessoryAds.forEach(ad => ad.modelName = "Accessory");
+    accessoryAds.forEach(ad => ad.modelName = "accessories");
 
     const announcementAds = await Announcement.find({ userId: req.user.id }).lean();
-    announcementAds.forEach(ad => ad.modelName = "Announcement");
+    announcementAds.forEach(ad => ad.modelName = "cars");
 
     const electronikaAds = await Electronika.find({ userId: req.user.id }).lean();
-    electronikaAds.forEach(ad => ad.modelName = "Electronika");
-
-    // lazım olsa əlavə modelləri də eyni şəkildə əlavə etmək olar
+    electronikaAds.forEach(ad => ad.modelName = "electronika");
 
     const allAds = [
       ...homeAds,
@@ -2281,7 +2279,6 @@ app.get("/api/my-announcements", verifyToken, async (req, res) => {
       ...electronikaAds
     ];
 
-    // ən sonuncu elan əvvəldə
     allAds.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
     res.json(allAds);
@@ -2293,106 +2290,84 @@ app.get("/api/my-announcements", verifyToken, async (req, res) => {
 
 
 
-// Mənim elanlarım
-// app.get("/api/my-announcements", verifyToken, async (req, res) => {
-//   try {
-//     const homeAds = await HomeAndGarden.find({ userId: req.user.id });
-//     const clothingAds = await Clothing.find({ userId: req.user.id });
-//     const phoneAds = await Phone.find({ userId: req.user.id });
-//     const householdAds = await HouseHold.find({ userId: req.user.id });
-//     const realEstateAds = await RealEstate.find({ userId: req.user.id });
-//     const accessoryAds = await Accessory.find({ userId: req.user.id });
-//     const announcementAds = await Announcement.find({ userId: req.user.id });
-//     const electronikaAds = await Electronika.find({ userId: req.user.id });
+const models = {
+  homGarden: HomeAndGarden,
+  clothing: Clothing,
+  phone: Phone,
+  household: HouseHold,
+  realEstate: RealEstate,
+  accessories: Accessory,
+  cars: Announcement,
+  electronika: Electronika,
+};
 
-//     // lazım olsa əlavə modelləri də yığırsan
-//     const allAds = [
-//       ...homeAds,
-//       ...clothingAds,
-//       ...phoneAds,
-//       ...householdAds,
-//       ...realEstateAds,
-//       ...accessoryAds,
-//       ...announcementAds,
-//       ...electronikaAds,
-//     ];
+app.delete("/api/:model/:id", verifyToken, async (req, res) => {
+  try {
+    const { model, id } = req.params;
+    const Model = models[model];
+    if (!Model) return res.status(400).json({ message: "Yanlış model adı" });
 
-//     // ən sonuncu elan əvvəldə
-//     allAds.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    const item = await Model.findById(id);
+    if (!item) return res.status(404).json({ message: "Elan tapılmadı" });
 
-//     res.json(allAds);
-//   } catch (err) {
-//     res.status(500).json({ error: err.message });
-//   }
-// });
+    if (item.userId.toString() !== req.user.id)
+      return res.status(403).json({ message: "İcazəniz yoxdur" });
 
-
-// // DELETE ümumi route
-// app.delete("/api/:model/:id", verifyToken, async (req, res) => {
-//   const { model, id } = req.params;
-
-//   const models = { 
-//     HomeAndGarden, 
-//     Clothing, 
-//     Phone, 
-//     HouseHold,   // ✅ düzəldildi
-//     RealEstate, 
-//     Accessory, 
-//     Announcement, 
-//     Electronika  // ✅ böyük hərflə
-//   };
-
-//   const SelectedModel = models[model];
-//   if (!SelectedModel) return res.status(400).json({ message: "Yanlış model adı" });
-
-//   try {
-//     const item = await SelectedModel.findById(id);
-//     if (!item) return res.status(404).json({ message: "Elan tapılmadı" });
-
-//     if (item.userId.toString() !== req.user.id) {
-//       return res.status(403).json({ message: "İcazə yoxdur" });
-//     }
-
-//     await item.deleteOne();
-//     res.json({ message: "Elan uğurla silindi" });
-//   } catch (err) {
-//     res.status(500).json({ error: err.message });
-//   }
-// });
-
+    await item.deleteOne();
+    res.json({ message: "Elan uğurla silindi" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 
 
 
 app.delete("/api/:model/:id", verifyToken, async (req, res) => {
-  let { model, id } = req.params;
+  const { model, id } = req.params;
 
-  // backend-dəki modellər kiçik hərflə açar kimi
   const models = {
-    homeandgarden: HomeAndGarden,
+    homGarden: HomeAndGarden,
     clothing: Clothing,
     phone: Phone,
     household: HouseHold,
     realestate: RealEstate,
     accessory: Accessory,
-    announcement: Announcement,
+    cars: Announcement,
     electronika: Electronika,
   };
 
-  // model adını kiçik hərfə çevir
-  const SelectedModel = models[model.toLowerCase()];
+  const SelectedModel = models[model];
   if (!SelectedModel) return res.status(400).json({ message: "Yanlış model adı" });
 
   try {
     const item = await SelectedModel.findById(id);
     if (!item) return res.status(404).json({ message: "Elan tapılmadı" });
 
+    if (item.userId.toString() !== req.user.id)
+      return res.status(403).json({ message: "Bu elanı silmək icazəniz yoxdur" });
+
+    await item.deleteOne();
+    res.json({ message: "Elan uğurla silindi" });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+
+app.delete("/api/my-announcements/:id", verifyToken, async (req, res) => {
+  try {
+    const item = await HomeAndGarden.findById(req.params.id);
+    if (!item) return res.status(404).json({ message: "Elan tapılmadı" });
+
+    // Yalnız elan sahibi silə bilər
     if (item.userId.toString() !== req.user.id) {
-      return res.status(403).json({ message: "İcazə yoxdur" });
+      return res.status(403).json({ message: "Bu elanı silmək icazəniz yoxdur" });
     }
 
     await item.deleteOne();
     res.json({ message: "Elan uğurla silindi" });
   } catch (err) {
+    console.error(err);
     res.status(500).json({ error: err.message });
   }
 });

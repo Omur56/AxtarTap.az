@@ -61,7 +61,10 @@
 import mongoose from "mongoose";
 
 const HouseHoldSchema = new mongoose.Schema({
-  
+  id: {
+    type: Number,
+    unique: true,
+  },
   category: String,
   title: String,
   description: String,

@@ -41,6 +41,10 @@
 import mongoose from "mongoose";
 
 const ClothingSchema = new mongoose.Schema({
+  id: {
+    type: Number,
+    unique: true,
+  },
   title: String,
   type: String,
   description: String,

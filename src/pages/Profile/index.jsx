@@ -614,33 +614,37 @@ export default function Profile() {
     fetchMyAds();
   }, []);
 
-  const handleDelete = async (ad) => {
-    if (!window.confirm("Bu elanı silmək istədiyinizə əminsiniz?")) return;
 
-    try {
-      const modelMap = {
-        homeandgarden: "HomeAndGarden",
-        clothing: "Clothing",
-        phone: "Phone",
-        household: "HouseHold",
-        realestate: "RealEstate",
-        accessory: "Accessory",
-        announcement: "Announcement",
-        electronika: "Electronika",
-      };
-      const modelName = modelMap[ad.modelName.toLowerCase()];
-      if (!modelName) return alert("Yanlış model adı!");
 
-      await axios.delete(`http://localhost:5000/api/${modelName}/${ad._id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+const modelMap = {
+  homGarden: "homGarden",
+  Clothing: "clothing",
+  Phone: "phone",
+  Household: "household",
+  RealEstate: "realEstate",
+  accessories: "accessories",
+  cars: "cars",
+  electronika: "electronika",
+};
 
-      setMyAds((prev) => prev.filter((a) => a._id !== ad._id));
-    } catch (err) {
-      console.error("Elan silinmədi:", err);
-      alert("Elan silinmədi. Backend-də problem var.");
-    }
-  };
+const handleDelete = async (ad) => {
+  if (!window.confirm("Bu elanı silmək istədiyinizə əminsiniz?")) return;
+
+  try {
+    console.log("Silinəcək ID:", ad._id);
+
+    await axios.delete(`http://localhost:5000/api/${modelMap[ad.modelName]}/${ad._id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    setMyAds((prev) => prev.filter((a) => a._id !== ad._id));
+    alert("Elan uğurla silindi!");
+  } catch (err) {
+    console.error("Elan silinmədi:", err.response?.data || err);
+    alert("Elan silinmədi. Backend-də problem var.");
+  }
+};
+
 
   const openAdDetail = (id) => navigate(`/ads/${id}`);
 
@@ -701,12 +705,13 @@ export default function Profile() {
                 </p>
                 <div className="flex justify-between items-center mt-auto">
                   <span className="text-green-600 font-bold text-lg">{ad.price ? ad.price + " ₼" : "-"}</span>
-                  <button
-                    onClick={(e) => { e.stopPropagation(); handleDelete(ad); }}
-                    className="bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md"
-                  >
-                    Sil
-                  </button>
+                 <button
+      onClick={() => handleDelete(ad)}
+      className="delete-btn"
+      style={{ backgroundColor: "red", color: "white", padding: "5px 10px", border: "none", borderRadius: "5px", cursor: "pointer" }}
+    >
+      Sil
+    </button>
                 </div>
               </div>
             </div>

@@ -1,7 +1,10 @@
 import mongoose from "mongoose";
 
 const phoneSchema = new mongoose.Schema({
-
+id:{
+  type:Number,
+  unique:true
+},
   title: String,
   brand: String,
   model: String,

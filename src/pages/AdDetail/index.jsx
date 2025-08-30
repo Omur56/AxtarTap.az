@@ -6,6 +6,7 @@ import "react-responsive-carousel/lib/styles/carousel.min.css";
 import { X } from "lucide-react";
 import Box from '@mui/material/Box';
 import LinearProgress from '@mui/material/LinearProgress';
+import {useNavigate} from 'react-router-dom';
 
 export default function AdDetail() {
   const { id } = useParams();
@@ -15,6 +16,9 @@ export default function AdDetail() {
   const [allAds, setAllAds] = useState([]);
   const [zoomIndex, setZoomIndex] = useState(null);
 
+  const navigate = useNavigate();
+// Hal-hazırki istifadəçi məlumatını əldə et (token və ya userId)
+const currentUserId = localStorage.getItem("userId"); // backend-də istifadəçi id saxlanılırsa
   // Progress bar states
   const [progress, setProgress] = useState(0);
   const [buffer, setBuffer] = useState(10);
@@ -58,6 +62,23 @@ export default function AdDetail() {
     };
     fetchAd();
   }, [id]);
+
+  // Silmə funksiyası
+const handleDelete = async () => {
+  if (!window.confirm("Bu elanı silmək istədiyinizdən əminsiniz?")) return;
+
+  try {
+    const token = localStorage.getItem("token");
+    await axios.delete(`http://localhost:5000/api/my-announcements/${id}`, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    alert("Elan uğurla silindi!");
+    navigate("/profile"); // silindikdən sonra profile-ə yönləndir
+  } catch (err) {
+    console.error("Elan silinmədi:", err);
+    alert("Elan silinərkən xəta baş verdi!");
+  }
+};
 
   // Progress bar logic
   const progressRef = React.useRef(() => {});
@@ -143,6 +164,15 @@ export default function AdDetail() {
             {ad.location && <li><span className="font-bold">Yerləşmə:</span> {ad.location}</li>}
             {ad.description && <li className="line-clamp-4"><span className="font-bold">Qeyd:</span> {ad.description}</li>}
           </ul>
+
+          {ad.userId === currentUserId && (
+  <button
+    onClick={handleDelete}
+    className="mt-4 w-full py-3 bg-red-500 hover:bg-red-700 text-white font-bold rounded-lg transition"
+  >
+    Elanı Sil
+  </button>
+)}
 
           <div className="flex justify-between text-sm text-gray-500 mt-4">
             <p>Elanın nömrəsi: {ad._id}</p>
