@@ -13,7 +13,7 @@ export default function  PostDetailElectronika() {
 
 
    useEffect(() =>{
-    axios.get(`http://localhost:5000/api/electronika/${id}`)
+    axios.get(`${process.env.REACT_APP_API_URL}/api/electronika/${id}`)
     .then((res) => setElectronikaPost(res.data))
     .catch((err) => console.error("Xeta:", err));
    }, [id]);

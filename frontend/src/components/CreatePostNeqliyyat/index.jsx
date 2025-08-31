@@ -71,7 +71,7 @@ export default function CreatePost() {
 
   const fetchCars = async () => {
     try {
-      const res = await axios.get(`http://localhost:5000/api/cars`);
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/cars`);
       setCars(res.data);
     } catch (err) {
       console.error(err);
@@ -111,7 +111,7 @@ const handleSubmit = async (e) => {
   formData.append("userId", userId);
 
   try {
-    await axios.post("http://localhost:5000/api/cars", formData, {
+    await axios.post(`${process.env.REACT_APP_API_URL}/api/cars`, formData, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "multipart/form-data",
@@ -204,7 +204,7 @@ const handleSubmit = async (e) => {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const apiUrls = ["http://localhost:5000/api/cars"];
+  const apiUrls = [`${process.env.REACT_APP_API_URL}/api/cars`];
 
   const handleSearch = async () => {
     if (!query.trim()) return;
@@ -266,7 +266,7 @@ const handleSubmit = async (e) => {
       setIsLoading(true);
       try {
         const [neqliyyat] = await Promise.all([
-          axios.get("http://localhost:5000/api/cars"),
+          axios.get(`${process.env.REACT_APP_API_URL}/api/cars`),
         ]);
 
         setNeqliyyat(neqliyyat.data);

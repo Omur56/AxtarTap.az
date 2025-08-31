@@ -25,14 +25,14 @@ export default function PostDetailRealEstate() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/RealEstate/")
+      .get(`${process.env.REACT_APP_API_URL}/api/RealEstate/`)
       .then((res) => setRealEstate(res.data))
       .catch((err) => console.error("Xəta baş verdi:", err));
   }, []);
 
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/api/RealEstate/${id}`)
+      .get(`${process.env.REACT_APP_API_URL}/api/RealEstate/${id}`)
       .then((res) => {
         setPost(res.data);
         setLoading(false);
@@ -51,7 +51,7 @@ export default function PostDetailRealEstate() {
       setIsLoading(true);
       try {
         const [realEstate] = await Promise.all([
-          axios.get("http://localhost:5000/api/realEstate"),
+          axios.get(`${process.env.REACT_APP_API_URL}/api/realEstate`),
         ]);
 
         setRealEstate(realEstate.data);
@@ -240,7 +240,7 @@ export default function PostDetailRealEstate() {
                       src={
                         img.startsWith("http")
                           ? img
-                          : `http://localhost:5000/uploads/${img}`
+                          : `${process.env.REACT_APP_API_URL}/uploads/${img}`
                       }
                       alt={`Şəkil ${index + 1}`}
                       className="w-full h-full object-contain rounded-lg"
@@ -411,7 +411,7 @@ export default function PostDetailRealEstate() {
             src={
               imageArray[zoomIndex].startsWith("http")
                 ? imageArray[zoomIndex]
-                : `http://localhost:5000/uploads/${imageArray[zoomIndex]}`
+                : `${process.env.REACT_APP_API_URL}/uploads/${imageArray[zoomIndex]}`
             }
             alt="Zoomed"
             className="max-w-[90%] max-h-[90%] object-contain rounded-lg"

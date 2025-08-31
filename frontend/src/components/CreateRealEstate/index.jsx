@@ -64,7 +64,7 @@ export default function CreateRealEstate() {
 
   const fetchItems = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/RealEstate");
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/RealEstate`);
       setRealEstateList(res.data);
     } catch (err) {
       console.error(err);
@@ -134,7 +134,7 @@ const handleSubmit = async (e) => {
   try {
     if (editingId) {
       await axios.put(
-        `http://localhost:5000/api/realEstate/${editingId}`,
+        `${process.env.REACT_APP_API_URL}/api/realEstate/${editingId}`,
         formData,
         {
           headers: {
@@ -146,7 +146,7 @@ const handleSubmit = async (e) => {
       setEditingId(null);
     } else {
       await axios.post(
-        "http://localhost:5000/api/realEstate",
+        `${process.env.REACT_APP_API_URL}/api/realEstate`,
         formData,
         {
           headers: {
@@ -179,7 +179,7 @@ const handleSubmit = async (e) => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/realEstate/${id}`);
+      await axios.delete(`${process.env.REACT_APP_API_URL}/api/realEstate/${id}`);
       fetchItems();
     } catch (err) {
       console.error("Delete error:", err);
@@ -188,7 +188,7 @@ const handleSubmit = async (e) => {
 
   const handleFavorite = async (id) => {
     try {
-      await axios.patch(`http://localhost:5000/api/realEstate/${id}/favorite`);
+      await axios.patch(`${process.env.REACT_APP_API_URL}/api/realEstate/${id}/favorite`);
       fetchItems();
     } catch (err) {
       console.error(err);
@@ -198,7 +198,7 @@ const handleSubmit = async (e) => {
   // Like
   const handleLike = async (id) => {
     try {
-      await axios.patch(`http://localhost:5000/api/realEstate/${id}/like`);
+      await axios.patch(`${process.env.REACT_APP_API_URL}/api/realEstate/${id}/like`);
       fetchItems();
     } catch (err) {
       console.error(err);
@@ -214,7 +214,7 @@ const handleSubmit = async (e) => {
     setEditingId(item._id);
     setPreview(
       item.images
-        ? item.images.map((img) => `http://localhost:5000/uploads/${img}`)
+        ? item.images.map((img) => `${process.env.REACT_APP_API_URL}/uploads/${img}`)
         : []
     );
   };
@@ -250,7 +250,7 @@ const handleSubmit = async (e) => {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const apiUrls = ["http://localhost:5000/api/realEstate"];
+  const apiUrls = [`${process.env.REACT_APP_API_URL}/api/realEstate`];
 
   const handleSearch = async () => {
     if (!query.trim()) return;
@@ -311,7 +311,7 @@ const handleSubmit = async (e) => {
       setIsLoading(true);
       try {
         const [realEstate] = await Promise.all([
-          axios.get("http://localhost:5000/api/realEstate"),
+          axios.get(`${process.env.REACT_APP_API_URL}/api/realEstate`),
         ]);
 
         setRealEstate(realEstate.data);
@@ -560,19 +560,19 @@ const handleOpenForm = () => {
     </Box>}
           {loading && results.length === 0 && (
            <div class="h-screen w-full flex flex-col justify-center items-center bg-gradient-to-r from-fuchsia-100 to-violet-200">
-	<h1 class="text-9xl font-extrabold text-white tracking-widest">404</h1>
-	<div class="bg-[#FF6A3D] px-2 text-sm rounded rotate-12 absolute">
+	<h1 className="text-9xl font-extrabold text-white tracking-widest">404</h1>
+	<div className="bg-[#FF6A3D] px-2 text-sm rounded rotate-12 absolute">
 		Elan Yüklənmədi
 	</div>
-	<button class="mt-5">
+	<button className="mt-5">
       <a
-        class="relative inline-block text-sm font-medium text-green-500 group active:text-green-500 focus:outline-none focus:ring"
+        className="relative inline-block text-sm font-medium text-green-500 group active:text-green-500 focus:outline-none focus:ring"
       >
         <span
-          class="absolute inset-0 transition-transform translate-x-0.5 translate-y-0.5 bg-red-500 group-hover:translate-y-0 group-hover:translate-x-0"
+          className="absolute inset-0 transition-transform translate-x-0.5 translate-y-0.5 bg-red-500 group-hover:translate-y-0 group-hover:translate-x-0"
         ></span>
 
-        <span class="relative block px-8 py-3 bg-[#1A2238] border border-current">
+        <span className="relative block px-8 py-3 bg-[#1A2238] border border-current">
           <router-link to="/">Əsas səhifə</router-link>
         </span>
       </a>

@@ -4,11 +4,7 @@ const brandsWithModels = {
   Abarth: ["500", "595", "124 Spider"],
   Acura: ["ILX", "MDX", "RDX"],
   Alfa_Romeo: ["Giulia", "Stelvio", "4C", "Mito", "33"],
-  Aodessa: [
-    "DessertCross 1000-300",
-    "DessertCross 1000-500",
-    "DessertCross 1000-700",
-  ],
+  Aodessa: ["DessertCross 1000-300","DessertCross 1000-500","DessertCross 1000-700",],
   Audi: ["A3", "A4", "A6", "Q5", "Q7"],
   Bentley: ["Continental GT", "Flying Spur", "Bentayga"],
   Bugatti: ["Chiron", "Veyron"],

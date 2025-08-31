@@ -64,7 +64,7 @@ export default function CreateClothing() {
 
   const fetchItems = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/Clothing/");
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/Clothing/`);
       setClothingItems(res.data);
     } catch (err) {
       console.error(err);
@@ -109,13 +109,13 @@ const handleSubmit = async (e) => {
 
     if (editingId) {
       await axios.put(
-        `http://localhost:5000/api/Clothing/${editingId}`,
+        `${process.env.REACT_APP_API_URL}/api/Clothing/${editingId}`,
         formData,
         config
       );
       setEditingId(null);
     } else {
-      await axios.post("http://localhost:5000/api/Clothing/", formData, config);
+      await axios.post(`${process.env.REACT_APP_API_URL}/api/Clothing/`, formData, config);
       Swal.fire({
         icon: "success",
         title: "Elanınız uğurla yerləşdirildi!",
@@ -165,7 +165,7 @@ const handleSubmit = async (e) => {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/Clothing/${id}`);
+      await axios.delete(`${process.env.REACT_APP_API_URL}/api/Clothing/${id}`);
       fetchItems();
     } catch (err) {
       console.error("Delete error:", err);
@@ -174,7 +174,7 @@ const handleSubmit = async (e) => {
 
   const handleFavorite = async (id) => {
     try {
-      await axios.patch(`http://localhost:5000/api/Clothing/${id}/favorite`);
+      await axios.patch(`${process.env.REACT_APP_API_URL}/api/Clothing/${id}/favorite`);
       fetchItems();
     } catch (err) {
       console.error(err);
@@ -183,7 +183,7 @@ const handleSubmit = async (e) => {
 
   const handleLike = async (id) => {
     try {
-      await axios.patch(`http://localhost:5000/api/Clothing/${id}/like`);
+      await axios.patch(`${process.env.REACT_APP_API_URL}/api/Clothing/${id}/like`);
       fetchItems();
     } catch (err) {
       console.error(err);
@@ -232,7 +232,7 @@ const handleSubmit = async (e) => {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const apiUrls = ["http://localhost:5000/api/Clothing"];
+  const apiUrls = [`${process.env.REACT_APP_API_URL}/api/Clothing`];
 
   const handleSearch = async () => {
     if (!query.trim()) return;
@@ -296,7 +296,7 @@ const handleSubmit = async (e) => {
       setIsLoading(true);
       try {
         const [clothing] = await Promise.all([
-          axios.get("http://localhost:5000/api/Clothing"),
+          axios.get(`${process.env.REACT_APP_API_URL}/api/Clothing`),
         ]);
 
         setClothing(clothing.data);

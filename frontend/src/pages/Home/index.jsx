@@ -14,7 +14,7 @@ const Home = () => {
   useEffect(() => {
     const fetchCars = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/cars");
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/cars`);
         setCars(res.data);
       } catch (err) {
         console.error("Elanlar yüklənmədi:", err);
@@ -28,7 +28,7 @@ const Home = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/homGarden")
+      .get(`${process.env.REACT_APP_API_URL}/api/homGarden`)
       .then((res) => {
       
         setHomeGarden(res.data);
@@ -42,7 +42,7 @@ const Home = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/electronika")
+      .get(`${process.env.REACT_APP_API_URL}/api/electronika`)
       .then((res) => {
         
         setElektronikaPost(res.data);
@@ -56,7 +56,7 @@ const Home = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/accessories")
+      .get(`${process.env.REACT_APP_API_URL}/api/accessories`)
       .then((res) => {
        
         setAccessories(res.data);
@@ -70,7 +70,7 @@ const Home = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/realEstate")
+      .get(`${process.env.REACT_APP_API_URL}/api/realEstate`)
       .then((res) => {
         
         setRealEstate(res.data);
@@ -84,7 +84,7 @@ const Home = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/Household")
+      .get(`${process.env.REACT_APP_API_URL}/api/Household`)
       .then((res) => {
       
         setHousehold(res.data);
@@ -98,7 +98,7 @@ const Home = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/Phone")
+      .get(`${process.env.REACT_APP_API_URL}/api/Phone`)
       .then((res) => {
       
         setPhone(res.data);
@@ -112,7 +112,7 @@ const Home = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/Clothing")
+      .get(`${process.env.REACT_APP_API_URL}/api/Clothing`)
       .then((res) => {
       
         setClothing(res.data);
@@ -151,14 +151,14 @@ const Home = () => {
   const [loading, setLoading] = useState(false);
 
   const apiUrls = [
-    "http://localhost:5000/api/cars",
-    "http://localhost:5000/api/homGarden",
-    "http://localhost:5000/api/electronika",
-    "http://localhost:5000/api/accessories",
-    "http://localhost:5000/api/realEstate",
-    "http://localhost:5000/api/Household",
-    "http://localhost:5000/api/Phone",
-    "http://localhost:5000/api/Clothing",
+    `${process.env.REACT_APP_API_URL}/api/cars`,
+    `${process.env.REACT_APP_API_URL}/api/homGarden`,
+    `${process.env.REACT_APP_API_URL}/api/electronika`,
+    `${process.env.REACT_APP_API_URL}/api/accessories`,
+    `${process.env.REACT_APP_API_URL}/api/realEstate`,
+    `${process.env.REACT_APP_API_URL}/api/Household`,
+    `${process.env.REACT_APP_API_URL}/api/Phone`,
+    `${process.env.REACT_APP_API_URL}/api/Clothing`,
   ];
 
   const handleSearch = async () => {
@@ -230,14 +230,14 @@ const Home = () => {
           phoneRes,
           clothingRes,
         ] = await Promise.all([
-          axios.get("http://localhost:5000/api/cars"),
-          axios.get("http://localhost:5000/api/homGarden"),
-          axios.get("http://localhost:5000/api/electronika"),
-          axios.get("http://localhost:5000/api/accessories"),
-          axios.get("http://localhost:5000/api/realEstate"),
-          axios.get("http://localhost:5000/api/Household"),
-          axios.get("http://localhost:5000/api/Phone"),
-          axios.get("http://localhost:5000/api/Clothing"),
+          axios.get(`${process.env.REACT_APP_API_URL}/api/cars`),
+          axios.get(`${process.env.REACT_APP_API_URL}/api/homGarden`),
+          axios.get(`${process.env.REACT_APP_API_URL}/api/electronika`),
+          axios.get(`${process.env.REACT_APP_API_URL}/api/accessories`),
+          axios.get(`${process.env.REACT_APP_API_URL}/api/realEstate`),
+          axios.get(`${process.env.REACT_APP_API_URL}/api/Household`),
+          axios.get(`${process.env.REACT_APP_API_URL}/api/Phone`),
+          axios.get(`${process.env.REACT_APP_API_URL}/api/Clothing`),
         ]);
 
         setCars(carsRes.data);
@@ -263,7 +263,7 @@ const Home = () => {
 
   const fetchAds = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/ads");
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/ads`);
       setAds(res.data);
     } catch (err) {
       console.error("Reklamları gətirərkən xəta:", err);
@@ -283,7 +283,7 @@ const Home = () => {
         {ads.slice(0, 1).map((ad) => (
           <a key={ad._id} href={ad.link} target="_blank" rel="noreferrer">
             <img
-              src={`http://localhost:5000/${ad.image}`}
+              src={`${process.env.REACT_APP_API_URL}/${ad.image}`}
               alt={ad.title}
               className="rounded-md w-full h-[550px]" />
           </a>
@@ -445,7 +445,7 @@ const Home = () => {
                         post.images && post.images.length > 0
                           ? post.images[0].startsWith("http")
                             ? post.images[0]
-                            : `http://localhost:5000/uploads/${post.images[0]}`
+                            : `${process.env.REACT_APP_API_URL}/uploads/${post.images[0]}`
                           : "/no-image.jpg"
                       }
                       alt={post.title}
@@ -686,7 +686,7 @@ const Home = () => {
         {ads.slice(0, 1).map((ad) => (
           <a key={ad._id} href={ad.link} target="_blank" rel="noreferrer">
             <img
-              src={`http://localhost:5000/${ad.image}`}
+              src={`${process.env.REACT_APP_API_URL}/${ad.image}`}
               alt={ad.title}
               className="rounded-md w-full h-[550px] shadow-md"
             />

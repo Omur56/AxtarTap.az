@@ -62,7 +62,7 @@ export default function CreateHousehold() {
 
   const fetchItems = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/Household");
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/Household`);
       setHouseholdItems(response.data);
     } catch (error) {
       console.error("Error fetching accessory items:", error);
@@ -103,14 +103,14 @@ export default function CreateHousehold() {
 
     if (editingId) {
       await axios.put(
-        `http://localhost:5000/api/Household/${editingId}`,
+        `${process.env.REACT_APP_API_URL}/api/Household/${editingId}`,
         formData,
         config
       );
       setEditingId(null);
     } else {
       await axios.post(
-        "http://localhost:5000/api/Household",
+        `${process.env.REACT_APP_API_URL}/api/Household`,
         formData,
         config
       );
@@ -161,7 +161,7 @@ export default function CreateHousehold() {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/Household/${id}`);
+      await axios.delete(`${process.env.REACT_APP_API_URL}/api/Household/${id}`);
       fetchItems();
     } catch (error) {
       console.error("Delete error:", error);
@@ -170,7 +170,7 @@ export default function CreateHousehold() {
 
   const handleFavorite = async (id) => {
     try {
-      await axios.patch(`http://localhost:5000/api/Household/${id}/favorite`);
+      await axios.patch(`${process.env.REACT_APP_API_URL}/api/Household/${id}/favorite`);
       fetchItems();
     } catch (err) {
       console.error(err);
@@ -179,7 +179,7 @@ export default function CreateHousehold() {
 
   const handleLike = async (id) => {
     try {
-      await axios.patch(`http://localhost:5000/api/Household/${id}/like`);
+      await axios.patch(`${process.env.REACT_APP_API_URL}/api/Household/${id}/like`);
       fetchItems();
     } catch (err) {
       console.error(err);
@@ -203,7 +203,7 @@ export default function CreateHousehold() {
 
   const handleImageDelete = async (image) => {
     try {
-      await axios.delete(`http://localhost:5000/api/Household/images/${image}`);
+      await axios.delete(`${process.env.REACT_APP_API_URL}/api/Household/images/${image}`);
       fetchItems();
     } catch (error) {
       console.error(error);
@@ -243,7 +243,7 @@ export default function CreateHousehold() {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const apiUrls = ["http://localhost:5000/api/Household"];
+  const apiUrls = [`${process.env.REACT_APP_API_URL}/api/Household`];
 
   const handleSearch = async () => {
     if (!query.trim()) return;
@@ -307,7 +307,7 @@ export default function CreateHousehold() {
       setIsLoading(true); // loading başladı
       try {
         const [accessoriesRes] = await Promise.all([
-          axios.get("http://localhost:5000/api/Household"),
+          axios.get(`${process.env.REACT_APP_API_URL}/api/Household`),
         ]);
 
         setAccessories(accessoriesRes.data);
@@ -544,19 +544,19 @@ const handleOpenForm = () => {
     </Box>}
           {loading && results.length === 0 && (
            <div class="h-screen w-full flex flex-col justify-center items-center bg-gradient-to-r from-fuchsia-100 to-violet-200">
-	<h1 class="text-9xl font-extrabold text-white tracking-widest">404</h1>
-	<div class="bg-[#FF6A3D] px-2 text-sm rounded rotate-12 absolute">
+	<h1 className="text-9xl font-extrabold text-white tracking-widest">404</h1>
+	<div className="bg-[#FF6A3D] px-2 text-sm rounded rotate-12 absolute">
 		Elan Yüklənmədi
 	</div>
-	<button class="mt-5">
+	<button className="mt-5">
       <a
-        class="relative inline-block text-sm font-medium text-green-500 group active:text-green-500 focus:outline-none focus:ring"
+        className="relative inline-block text-sm font-medium text-green-500 group active:text-green-500 focus:outline-none focus:ring"
       >
         <span
-          class="absolute inset-0 transition-transform translate-x-0.5 translate-y-0.5 bg-red-500 group-hover:translate-y-0 group-hover:translate-x-0"
+          className="absolute inset-0 transition-transform translate-x-0.5 translate-y-0.5 bg-red-500 group-hover:translate-y-0 group-hover:translate-x-0"
         ></span>
 
-        <span class="relative block px-8 py-3 bg-[#1A2238] border border-current">
+        <span className="relative block px-8 py-3 bg-[#1A2238] border border-current">
           <router-link to="/">Əsas səhifə</router-link>
         </span>
       </a>

@@ -22,14 +22,14 @@ const [progress, setProgress] = React.useState(0);
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/electronika")
+      .get(`${process.env.REACT_APP_API_URL}/api/electronika`)
       .then((res) => setPosts(res.data))
       .catch((err) => console.error("Xəta:", err));
   }, []);
 
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/api/electronika/${id}`)
+      .get(`${process.env.REACT_APP_API_URL}/api/electronika/${id}`)
       .then((res) => setPost(res.data))
       .catch((err) => console.error("Xəta:", err));
   }, [id]);
@@ -173,7 +173,7 @@ const [progress, setProgress] = React.useState(0);
                   src={
                     img.startsWith("http")
                       ? img
-                      : `http://localhost:5000/uploads/${img}`
+                      : `${process.env.REACT_APP_API_URL}/uploads/${img}`
                   }
                   alt={`Şəkil ${index + 1}`}
                   className="w-full h-full object-contain rounded-lg"
@@ -300,7 +300,7 @@ const [progress, setProgress] = React.useState(0);
             src={
               imageArray[zoomIndex].startsWith("http")
                 ? imageArray[zoomIndex]
-                : `http://localhost:5000/uploads/${imageArray[zoomIndex]}`
+                : `${process.env.REACT_APP_API_URL}/uploads/${imageArray[zoomIndex]}`
             }
             alt="Zoomed"
             className="max-w-[90%] max-h-[90%] object-contain rounded-lg"

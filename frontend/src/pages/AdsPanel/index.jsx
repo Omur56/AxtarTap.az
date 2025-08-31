@@ -6,7 +6,7 @@ export default function AdsPanel() {
 
   const fetchAds = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/ads");
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/ads`);
       setAds(res.data);
     } catch (err) {
       console.error("Reklamları gətirərkən xəta:", err);
@@ -24,7 +24,7 @@ export default function AdsPanel() {
         {ads.slice(0, 3).map((ad) => (
           <a key={ad._id} href={ad.link} target="_blank" rel="noreferrer">
             <img
-              src={`http://localhost:5000/${ad.image}`}
+              src={`${process.env.REACT_APP_API_URL}/${ad.image}`}
               alt={ad.title}
               className="rounded-md shadow-md"
             />
@@ -40,7 +40,7 @@ export default function AdsPanel() {
         {ads.slice(3, 6).map((ad) => (
           <a key={ad._id} href={ad.link} target="_blank" rel="noreferrer">
             <img
-              src={`http://localhost:5000/${ad.image}`}
+              src={`${process.env.REACT_APP_API_URL}/${ad.image}`}
               alt={ad.title}
               className="rounded-md shadow-md"
             />

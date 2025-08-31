@@ -28,7 +28,7 @@ const currentUserId = localStorage.getItem("userId"); // backend-də istifadəç
     const fetchAllAds = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get("http://localhost:5000/api/my-announcements", {
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/my-announcements`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setAllAds(res.data.filter(a => a._id !== id));
@@ -44,7 +44,7 @@ const currentUserId = localStorage.getItem("userId"); // backend-də istifadəç
     const fetchAd = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get("http://localhost:5000/api/my-announcements", {
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/my-announcements`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         const selectedAd = res.data.find(a => a._id === id);
@@ -69,7 +69,7 @@ const handleDelete = async () => {
 
   try {
     const token = localStorage.getItem("token");
-    await axios.delete(`http://localhost:5000/api/my-announcements/${id}`, {
+    await axios.delete(`${process.env.REACT_APP_API_URL}/api/my-announcements/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     alert("Elan uğurla silindi!");
@@ -144,7 +144,7 @@ const handleDelete = async () => {
             {imageArray.map((img, index) => (
               <div key={index} className="w-full h-[400px] cursor-pointer" onClick={() => openZoom(index)}>
                 <img
-                  src={img.startsWith("http") ? img : `http://localhost:5000/uploads/${img}`}
+                  src={img.startsWith("http") ? img : `${process.env.REACT_APP_API_URL}/uploads/${img}`}
                   alt={`Şəkil ${index+1}`}
                   className="w-full h-full object-contain rounded-lg"
                 />
@@ -199,7 +199,7 @@ const handleDelete = async () => {
             <div className="bg-white rounded-2xl sm:w-[240px] max-w-[240px] h-[300px] shadow-md hover:shadow-xl transition duration-200">
               <div className="w-full h-[178px] bg-gray-100 relative">
                 <img
-                  src={item.images?.[0]?.startsWith("http") ? item.images[0] : `http://localhost:5000/uploads/${item.images?.[0]}`}
+                  src={item.images?.[0]?.startsWith("http") ? item.images[0] : `${process.env.REACT_APP_API_URL}/uploads/${item.images?.[0]}`}
                   alt={item.brand}
                   className="absolute top-0 left-0 w-full h-full object-cover rounded-t-2xl"
                 />
@@ -219,7 +219,7 @@ const handleDelete = async () => {
         <div className="fixed inset-0 flex flex-col bg-black bg-opacity-90 justify-center items-center z-50" onClick={closeZoom}>
           <button onClick={closeZoom} className="absolute top-5 right-5 text-gray-600 hover:text-red-600"><X size={35} /></button>
           <button className="absolute left-5 text-white text-8xl" onClick={e => { e.stopPropagation(); prevImage(); }}>‹</button>
-          <img src={imageArray[zoomIndex].startsWith("http") ? imageArray[zoomIndex] : `http://localhost:5000/uploads/${imageArray[zoomIndex]}`} alt="Zoom" className="max-w-[90%] max-h-[90%] object-contain rounded-lg" />
+          <img src={imageArray[zoomIndex].startsWith("http") ? imageArray[zoomIndex] : `${process.env.REACT_APP_API_URL}/uploads/${imageArray[zoomIndex]}`} alt="Zoom" className="max-w-[90%] max-h-[90%] object-contain rounded-lg" />
           <button className="absolute right-5 text-white text-8xl" onClick={e => { e.stopPropagation(); nextImage(); }}>›</button>
         </div>
       )}

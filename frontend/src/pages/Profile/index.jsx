@@ -587,7 +587,7 @@ export default function Profile() {
     const userId = localStorage.getItem("userId");
     if (!token || !userId) return navigate("/login");
     try {
-      const res = await axios.get(`http://localhost:5000/api/users/${userId}`, {
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/users/${userId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setUserData(res.data);
@@ -598,7 +598,7 @@ export default function Profile() {
 
   const fetchMyAds = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/my-announcements", {
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/my-announcements`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setMyAds(res.data);
@@ -633,7 +633,7 @@ const handleDelete = async (ad) => {
   try {
     console.log("Silinəcək ID:", ad._id);
 
-    await axios.delete(`http://localhost:5000/api/${modelMap[ad.modelName]}/${ad._id}`, {
+    await axios.delete(`${process.env.REACT_APP_API_URL}/api/${modelMap[ad.modelName]}/${ad._id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
@@ -652,7 +652,7 @@ const handleDelete = async (ad) => {
     if (ad.images && ad.images.length > 0) {
       const firstImage = ad.images[0];
       if (firstImage.startsWith("http")) return firstImage;
-      return `http://localhost:5000/uploads/${firstImage}`;
+      return `${process.env.REACT_APP_API_URL}/uploads/${firstImage}`;
     }
     return "/no-image.jpg";
   };

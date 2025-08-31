@@ -19,7 +19,7 @@ export default function AdminPanel() {
 
   // axios-a header əlavə et
   const axiosInstance = axios.create({
-    baseURL: "http://localhost:5000/api",
+    baseURL: `${process.env.REACT_APP_API_URL}/api`,
     headers: { Authorization: `Bearer ${token}` },
   });
 
@@ -50,7 +50,7 @@ export default function AdminPanel() {
     formData.append("image", newAd.image);
 
     try {
-      await axios.post("http://localhost:5000/api/ads", formData, {
+      await axios.post(`${process.env.REACT_APP_API_URL}/api/ads`, formData, {
         headers: { "Content-Type": "multipart/form-data" },
       });
       alert("Reklam əlavə olundu ✅");
@@ -63,7 +63,7 @@ export default function AdminPanel() {
   // Reklam sil
   const handleDeleteAd = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/ads/${id}`);
+      await axios.delete(`${process.env.REACT_APP_API_URL}/api/ads/${id}`);
       setAds((prevAds) => prevAds.filter((ad) => ad._id !== id));
     } catch (err) {
       console.error("Reklam silərkən xəta:", err);
@@ -141,7 +141,7 @@ export default function AdminPanel() {
           {[...ads].reverse().map((ad) => (
             <div key={ad._id} className="p-4 bg-white rounded-lg shadow">
               <img
-                src={`http://localhost:5000/${ad.image}`}
+                src={`${process.env.REACT_APP_API_URL}/${ad.image}`}
                 alt={ad.title}
                 className="w-full h-32 object-cover rounded mb-2"
               />

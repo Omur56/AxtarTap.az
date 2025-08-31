@@ -19,14 +19,14 @@ export default function PostDetailCar() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/cars")
+      .get(`${process.env.REACT_APP_API_URL}/api/cars`)
       .then((res) => setCars(res.data))
       .catch((err) => console.error("Elanlar yüklənmədi:", err));
   }, []);
 
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/api/cars/${id}`)
+      .get(`${process.env.REACT_APP_API_URL}/api/cars/${id}`)
       .then((res) => {
         setPost(res.data);
         setLoading(false);
@@ -177,7 +177,7 @@ export default function PostDetailCar() {
                   src={
                     img.startsWith("http")
                       ? img
-                      : `http://localhost:5000/uploads/${img}`
+                      : `${process.env.REACT_APP_API_URL}/uploads/${img}`
                   }
                   alt={`Şəkil ${index + 1}`}
                   className="w-full h-full object-contain rounded-lg"
@@ -325,7 +325,7 @@ export default function PostDetailCar() {
             src={
               imageArray[zoomIndex].startsWith("http")
                 ? imageArray[zoomIndex]
-                : `http://localhost:5000/uploads/${imageArray[zoomIndex]}`
+                : `${process.env.REACT_APP_API_URL}/uploads/${imageArray[zoomIndex]}`
             }
             alt="Zoomed"
             className="max-w-[90%] max-h-[90%] object-contain rounded-lg"

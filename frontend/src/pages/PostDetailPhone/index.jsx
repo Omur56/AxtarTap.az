@@ -21,14 +21,14 @@ export default function PostDetailPhone() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/Phone/")
+      .get(`${process.env.REACT_APP_API_URL}/api/Phone/`)
       .then((res) => setPhone(res.data))
       .catch((err) => console.error("Xəta:", err));
   }, []);
 
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/api/Phone/${id}`)
+      .get(`${process.env.REACT_APP_API_URL}/api/Phone/${id}`)
       .then((res) => setPost(res.data))
       .catch((err) => console.error("Xəta:", err));
   }, [id]);
@@ -170,7 +170,7 @@ if (notFound || !post) return <div class="h-screen w-full flex flex-col justify-
                   src={
                     img.startsWith("http")
                       ? img
-                      : `http://localhost:5000/uploads/${img}`
+                      : `${process.env.REACT_APP_API_URL}/uploads/${img}`
                   }
                   alt={`Şəkil ${index + 1}`}
                   className="w-full h-full object-contain rounded-lg"
@@ -322,7 +322,7 @@ if (notFound || !post) return <div class="h-screen w-full flex flex-col justify-
             src={
               imageArray[zoomIndex].startsWith("http")
                 ? imageArray[zoomIndex]
-                : `http://localhost:5000/uploads/${imageArray[zoomIndex]}`
+                : `${process.env.REACT_APP_API_URL}/uploads/${imageArray[zoomIndex]}`
             }
             alt="Zoomed"
             className="max-w-[90%] max-h-[90%] object-contain rounded-lg"

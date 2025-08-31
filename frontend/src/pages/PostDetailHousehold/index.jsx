@@ -22,12 +22,12 @@ export default function PostDetailHousehold() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/Household/")
+      .get(`${process.env.REACT_APP_API_URL}/api/Household/`)
       .then((res) => setHousehold(res.data))
       .catch((err) => console.error("Xəta:", err));
 
     axios
-      .get(`http://localhost:5000/api/Household/${id}`)
+      .get(`${process.env.REACT_APP_API_URL}/api/Household/${id}`)
       .then((res) => setPost(res.data))
       .catch((err) => console.error("Xəta:", err));
   }, [id]);
@@ -168,7 +168,7 @@ if (notFound || !post) return <div class="h-screen w-full flex flex-col justify-
                   src={
                     img.startsWith("http")
                       ? img
-                      : `http://localhost:5000/uploads/${img}`
+                      : `${process.env.REACT_APP_API_URL}/uploads/${img}`
                   }
                   alt={`Şəkil ${index + 1}`}
                   className="w-full h-full object-contain rounded-lg"
@@ -299,7 +299,7 @@ if (notFound || !post) return <div class="h-screen w-full flex flex-col justify-
             src={
               imageArray[zoomIndex].startsWith("http")
                 ? imageArray[zoomIndex]
-                : `http://localhost:5000/uploads/${imageArray[zoomIndex]}`
+                : `${process.env.REACT_APP_API_URL}/uploads/${imageArray[zoomIndex]}`
             }
             alt="Zoomed"
             className="max-w-[90%] max-h-[90%] object-contain rounded-lg"

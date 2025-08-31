@@ -58,7 +58,7 @@ export default function CreateAccessoryPost() {
 
   const fetchItems = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/accessories");
+      const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/accessories`);
       setAccessoryItems(response.data);
     } catch (error) {
       console.error("Error fetching accessory items:", error);
@@ -101,7 +101,7 @@ export default function CreateAccessoryPost() {
   try {
     if (editingId) {
       await axios.put(
-        `http://localhost:5000/api/accessories/${editingId}`,
+        `${process.env.REACT_APP_API_URL}/api/accessories/${editingId}`,
         formData,
         {
           headers: {
@@ -112,7 +112,7 @@ export default function CreateAccessoryPost() {
       );
       setEditingId(null);
     } else {
-      await axios.post("http://localhost:5000/api/accessories", formData, {
+      await axios.post(`${process.env.REACT_APP_API_URL}/api/accessories`, formData, {
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "multipart/form-data",
@@ -161,7 +161,7 @@ export default function CreateAccessoryPost() {
 
   const handleDelete = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/api/accessories/${id}`);
+      await axios.delete(`${process.env.REACT_APP_API_URL}/api/accessories/${id}`);
       fetchItems();
     } catch (error) {
       console.error("Delete error:", error);
@@ -170,7 +170,7 @@ export default function CreateAccessoryPost() {
 
   const handleFavorite = async (id) => {
     try {
-      await axios.patch(`http://localhost:5000/api/accessories/${id}/favorite`);
+      await axios.patch(`${process.env.REACT_APP_API_URL}/api/accessories/${id}/favorite`);
       fetchItems();
     } catch (err) {
       console.error(err);
@@ -179,7 +179,7 @@ export default function CreateAccessoryPost() {
 
   const handleLike = async (id) => {
     try {
-      await axios.patch(`http://localhost:5000/api/accessories/${id}/like`);
+      await axios.patch(`${process.env.REACT_APP_API_URL}/api/accessories/${id}/like`);
       fetchItems();
     } catch (err) {
       console.error(err);
@@ -198,7 +198,7 @@ export default function CreateAccessoryPost() {
   const handleImageDelete = async (image) => {
     try {
       await axios.delete(
-        `http://localhost:5000/api/accessories/images/${image}`
+        `${process.env.REACT_APP_API_URL}/api/accessories/images/${image}`
       );
       fetchItems();
     } catch (error) {
@@ -239,7 +239,7 @@ export default function CreateAccessoryPost() {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
 
-  const apiUrls = ["http://localhost:5000/api/accessories"];
+  const apiUrls = [`${process.env.REACT_APP_API_URL}/api/accessories`];
 
   const handleSearch = async () => {
     if (!query.trim()) return;
@@ -303,7 +303,7 @@ export default function CreateAccessoryPost() {
       setIsLoading(true); // loading başladı
       try {
         const [accessoriesRes] = await Promise.all([
-          axios.get("http://localhost:5000/api/accessories"),
+          axios.get(`${process.env.REACT_APP_API_URL}/api/accessories`),
         ]);
 
         setAccessories(accessoriesRes.data);

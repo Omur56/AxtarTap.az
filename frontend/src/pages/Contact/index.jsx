@@ -17,7 +17,7 @@ const Contact = () => {
       <div className="text-green-500 text-5xl mb-4 flex justify-center">📱</div>
       <h3 className="text-xl font-semibold text-gray-800 mb-2">WhatsApp ilə əlaqə</h3>
       <a
-        href="https://wa.me/99455xxxxxxx"
+        href="https://wa.me/+994559138099"
         target="_blank"
         rel="noopener noreferrer"
         className="text-green-600 font-medium hover:underline"

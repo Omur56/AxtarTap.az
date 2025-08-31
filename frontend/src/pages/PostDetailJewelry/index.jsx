@@ -14,7 +14,7 @@ export default function PostDetailJewelry() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/Jewelry/")
+      .get(`${process.env.REACT_APP_API_URL}/api/Jewelry/`)
       .then((res) => {
         console.log("Gələn data:", res.data);
         setJewelry(res.data);
@@ -27,7 +27,7 @@ export default function PostDetailJewelry() {
   useEffect(() => {
     const fetchCars = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/Jewelry/");
+        const res = await axios.get(`${process.env.REACT_APP_API_URL}/api/Jewelry/`);
         setJewelry(res.data);
       } catch (err) {
         console.error("Elanlar yüklənmədi:", err);
@@ -39,7 +39,7 @@ export default function PostDetailJewelry() {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/api/Jewelry/${id}`)
+      .get(`${process.env.REACT_APP_API_URL}/api/Jewelry/${id}`)
       .then((res) => {
         setPost(res.data);
         setLoading(false);
@@ -116,7 +116,7 @@ export default function PostDetailJewelry() {
                     src={
                       img.startsWith("http")
                         ? img
-                        : `http://localhost:5000/uploads/${img}`
+                        : `${process.env.REACT_APP_API_URL}/uploads/${img}`
                     }
                     alt={`Şəkil ${index + 1}`}
                     className="w-full  object-contain rounded-xl"

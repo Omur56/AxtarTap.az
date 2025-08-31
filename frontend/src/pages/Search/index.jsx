@@ -10,14 +10,14 @@ const Search = () => {
   const [loading, setLoading] = useState(false);
 
   const apiUrls = [
-    "http://localhost:5000/api/cars",
-    "http://localhost:5000/api/homGarden",
-    "http://localhost:5000/api/electronika",
-    "http://localhost:5000/api/accessories",
-    "http://localhost:5000/api/realEstate",
-    "http://localhost:5000/api/Household",
-    "http://localhost:5000/api/Phone",
-    "http://localhost:5000/api/Clothing",
+    `${process.env.REACT_APP_API_URL}/api/cars`,
+    `${process.env.REACT_APP_API_URL}/api/homGarden`,
+    `${process.env.REACT_APP_API_URL}/api/electronika`,
+    `${process.env.REACT_APP_API_URL}/api/accessories`,
+    `${process.env.REACT_APP_API_URL}/api/realEstate`,
+    `${process.env.REACT_APP_API_URL}/api/Household`,
+    `${process.env.REACT_APP_API_URL}/api/Phone`,
+    `${process.env.REACT_APP_API_URL}/api/Clothing`,
   ];
 
   const handleSearch = async () => {
